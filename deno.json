@@ -1,0 +1,15 @@
+{
+  "workspace": [
+    "./cli",
+    "./packages/*"
+  ],
+  "fmt": {
+    "semiColons": true
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["ban-untagged-todo"]
+    }
+  }
+}

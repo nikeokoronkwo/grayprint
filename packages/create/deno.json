@@ -1,0 +1,4 @@
+{
+    "name": "@boilerplate/create",
+    "exports": "./mod.ts"
+}
