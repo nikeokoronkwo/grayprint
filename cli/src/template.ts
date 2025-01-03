@@ -142,6 +142,50 @@ interface CoreTemplate extends BaseTemplate {
   name: "core";
 }
 
+const frameworks = {
+    react: {
+        name: 'React',
+        meta: [{
+            name: 'NextJS',
+            // When scaffolding nextjs app, run deno install afterwards
+            scaffold: (options) => {
+                return [
+                    ...options.packageInstaller, 'create-next',
+                    options['tailwind'] ? '--tailwind' : '--no-tailwind',
+                    options['eslint'] ? '--eslint' : '--no-eslint',
+                    options['typescript'] ? '--typescript' : '--javascript',
+                    options.packageManager === 'deno' ? '--skip-install' : `--use-${options.packageManager}`
+                ].join(' ');
+            }
+        }, {
+            name: 'Remix',
+            scaffold: (options) => {
+                return [
+                    ...options.commands.create, 'remix',
+                    '-y', options.config['name'],
+                    '--no-git-init', '--package-manager', options.packageManager
+                ].join(' ');
+            }
+        }],
+        apps: [{
+            name: 'React Native',
+            scaffoldOnOwn: true, 
+            scaffold: (options) => {
+                // todo
+            }
+        }, {
+            name: 'Ionic',
+            scaffoldOnOwn: true,
+        }]
+    },
+    preact: {},
+    angular: {},
+    vue: {},
+    solid: {},
+    qwik: {},
+    vanilla: {},
+}
+
 export function defineCoreTemplate(): CoreTemplate {
   const frontendOptions = [
     "React",
@@ -194,6 +238,12 @@ export function defineCoreTemplate(): CoreTemplate {
         type: "boolean",
         default: true,
       },
+      {
+        name: 'git',
+        question: 'Do you want to use Git for your project?',
+        type: "boolean",
+        default: true
+      }
     ],
     beforeCreate: (app) => {
       let meta;
@@ -296,23 +346,32 @@ export function defineCoreTemplate(): CoreTemplate {
       console.log(`Building ${app.config["name"]}`);
 
       // scaffold application
+
       // scaffold framework
+      if (app.config['vite'] !== 'No') {
+        // scaffold vite application
+      } else {
+        // scaffold metaframework
+      }
+      
+      // scaffold application if any
+      // expo app will need to be created and then diffed, and tsconfig.json would be merged
     },
   };
 }
 
 class Framework {
   name: string;
-  frontend?: string;
-  meta?: string[];
+  frontend?: FrontendFramework;
+  meta?: MetaFramework[];
   backend?: string[];
   mobile?: string[];
 
   constructor(
     name: string,
     options: {
-      meta?: string[];
-      frontend?: string;
+      meta?: MetaFramework[];
+      frontend?: FrontendFramework;
       backend?: string[];
       mobile?: string[];
     } = {},
@@ -324,12 +383,30 @@ class Framework {
   }
 }
 
+class FrontendFramework {
+    name: string;
+    vite?: boolean;
+    pkgName?: string;
+    scaffold?: () => void;
+
+    constructor(name: string, options?: {
+        vite?: boolean,
+        pkgName?: string,
+        scaffold?: () => void;
+    }) {
+        this.name = name;
+        this.vite = options?.vite;
+        this.pkgName = options?.pkgName;
+        this.scaffold = options?.scaffold;
+    }
+}
+
 class MetaFramework {
   name: string;
   pkgName?: string;
   pkgScaffold?: (name: string) => void;
 
-  constructor(name: string, scaffold: string | ((name: string) => void)) {
+  constructor(name: string, scaffold?: string | ((name: string) => void)) {
     this.name = name;
     if (typeof scaffold === "string") this.pkgName = scaffold;
     else this.pkgScaffold = scaffold;

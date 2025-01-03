@@ -35,6 +35,7 @@ export default defineTemplate({
         if (config['react']) {
 
             // can ask more questions in case more info is needed
+            // automatically added to config afterwards
             const angular = app.question({
                 statement: `Should We Use Angular?`,
                 type: 'boolean'
