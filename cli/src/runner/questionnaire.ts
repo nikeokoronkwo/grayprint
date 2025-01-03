@@ -1,15 +1,17 @@
 import { TemplateOptions } from "@boilerplate/core";
 // @deno-types="npm:@types/prompts"
-import { PromptObject } from "npm:prompts";
+import { Choice, PromptObject } from "npm:prompts";
 
 /** @todo Add more question options */
-export function optionToPrompt(option: TemplateOptions): PromptObject {
+export function optionToPrompt(option: TemplateOptions, options: TemplateOptions[]): PromptObject {
+    console.log(option);
     switch (option.type) {
         case 'boolean':
             return {
                 type: 'confirm',
                 name: option.name,
-                message: option.question
+                message: option.question,
+                initial: option.default
             };
         case 'string':
             return {
@@ -17,14 +19,18 @@ export function optionToPrompt(option: TemplateOptions): PromptObject {
                 name: option.name,
                 message: option.question,
             };
-            break;
         case 'list':
             return {
                 type: option.multiple ? 'multiselect' : 'select',
                 name: option.name,
                 message: option.question,
+                choices: typeof option.options === 'function' ? /* unimplemented */ [] : option.options.map(m => ({ title: m, value: m }))
             };
-            break;
+        default:
+            return {
+                type: 'text',
+                name: option.name,
+                message: option.question,
+            };
     }
-    throw new Error('Template Option not supported');
 }

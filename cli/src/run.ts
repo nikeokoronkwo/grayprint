@@ -1,6 +1,5 @@
 import { BaseTemplate } from "@boilerplate/core";
-// @deno-types="npm:@types/prompts"
-import prompts from "npm:prompts"
+import prompt from "npm:prompts"
 import { optionToPrompt } from "./runner/questionnaire.ts";
 
 export class Application {
@@ -8,13 +7,14 @@ export class Application {
 }
 
 /** Runs a template */
-export function runTemplate(template: BaseTemplate, options?: {}) {
+export async function runTemplate(template: BaseTemplate, options?: {}) {
     // first of all, get the template name
     const templName = template.name;
 
     // get the options 
     const opts = template.options;
-    const optResults = prompts(opts.map(optionToPrompt));
+    const optionPrompts = opts.map((o, _, a) => optionToPrompt(o, a));
+    const optResults = await prompt(optionPrompts);
 
     // run questionnaire based on options
     // start with those without a 'dependsOn',

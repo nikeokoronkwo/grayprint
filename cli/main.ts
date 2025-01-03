@@ -1,4 +1,9 @@
 import { parseArgs } from "jsr:@std/cli"
+import { defineCoreTemplate } from "./src/template.ts";
+import { getBuiltinTemplate, getTemplate, getTemplateType, getTemplateUrl, TemplateType } from "./src/plugin.ts";
+import { runTemplate } from "./src/run.ts";
+import { BaseTemplate } from "../packages/core/mod.ts";
+import prompts from "npm:prompts";
 
 type FlagType = 'boolean' | 'string' | 'list'
 
@@ -51,4 +56,10 @@ if (args.help) {
     Deno.exit(0);
 }
 
+console.log(args);
+
 // run basic template
+/** @todo Find a better way to do this */
+const template: BaseTemplate = args.template ? (getTemplateType(args.template) === TemplateType.Builtin ? getBuiltinTemplate(args.template) : getTemplate(getTemplateUrl(args.template))) : defineCoreTemplate();
+
+await runTemplate(template);
