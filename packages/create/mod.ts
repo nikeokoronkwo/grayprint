@@ -1,10 +1,9 @@
-export interface Template {
-  // extends BaseTemplate
-}
+import type { BaseTemplate, BaseTool } from "@boilerplate/core"
+export { commonQuestions } from "@boilerplate/core"
 
-export interface Tool {
-  // extends BaseTool
-}
+export interface Template extends BaseTemplate {}
+
+export interface Tool extends BaseTool {}
 
 /**
  * A function used for defining a boilerplate template

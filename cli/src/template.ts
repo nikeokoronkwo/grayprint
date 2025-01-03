@@ -1,146 +1,63 @@
-import { loadSync } from "jsr:@std/dotenv";
-
-type TemplateRuntime = "deno" | "node" | "bun";
-type TemplatePackageManager = "deno" | "bun" | "npm" | "pnpm" | "yarn";
-type TemplateOptionType = "string" | "boolean" | "list";
-
-interface BaseTemplateOptions<T extends TemplateOptionType> {
-  name: string;
-  question: string;
-  type?: T;
-  dependsOn?: string;
-  dependsIf?: (v: string | boolean | string[]) => boolean;
-  /** Whether the option is a secure option, like a password */
-  secure?: boolean;
-}
-
-interface StringTemplateOptions extends BaseTemplateOptions<"string"> {
-  default?: string;
-}
-
-interface BooleanTemplateOptions extends BaseTemplateOptions<"boolean"> {
-  default?: boolean;
-}
-
-interface ListTemplateOptions<T extends string = string>
-  extends BaseTemplateOptions<"list"> {
-  options: T[] | ((v: T) => T[]);
-  multiple?: boolean;
-}
-
-type TemplateOptions =
-  | StringTemplateOptions
-  | BooleanTemplateOptions
-  | ListTemplateOptions;
-
-export const commonQuestions: {
-  platform: TemplateOptions;
-  typescript: TemplateOptions;
-  packageManager: TemplateOptions;
-} = {
-  platform: {
-    name: "platform",
-    question: "What platform are you designing for?",
-    type: "list",
-    options: ["deno", "node", "bun"],
-  },
-  typescript: {
-    name: "typescript",
-    question: "Do you want to use typescript?",
-    type: "boolean",
-    default: true,
-  },
-  packageManager: {
-    name: "package_manager",
-    question: "What package manager do you want to use?",
-    type: "list",
-    dependsOn: "platform",
-    options: (v) => {
-      const items = ["npm", "pnpm", "yarn"];
-      if (v === "bun") items.push("bun");
-      else if (v === "deno") items.push("deno");
-      return items;
-    },
-  },
-};
-
-type DefaultValue<T extends TemplateOptions> = T["type"] extends "string"
-  ? string
-  : T["type"] extends "boolean"
-    ? boolean
-    : T["type"] extends "list"
-      ? string[]
-      : string;
-
-type TemplateConfig<T extends TemplateOptions[]> = {
-  [K in T[number] as K["name"]]: DefaultValue<K> | undefined;
-};
-
-interface TemplateContext<T extends TemplateOptions[]> {
-  config: TemplateConfig<T>;
-  /** Run a cli question for the given  */
-  question: (q: TemplateOptions) => DefaultValue<typeof q>;
-  // deno-lint-ignore no-explicit-any
-  log: (msg: any) => void;
-}
-
-interface TemplateBuiltContext<T extends TemplateOptions[]>
-  extends TemplateContext<T> {
-  env: TemplateEnv;
-  typescript: boolean;
-  runtime: TemplateRuntime;
-  packageManager: TemplatePackageManager;
-  use: (tool: Tool) => void;
-  install: (tool: string) => void;
-  run: (...args: string[]) => void;
-  path: TemplatePaths;
-  copyFile: (from: string, dest: string) => void;
-  copyDir: (from: string, dest: string) => void;
-}
-
-interface TemplatePaths {
-  ROOT: string;
-}
-
-/**
- * Defines a Tool
- */
-interface Tool {}
-
-/** @todo Implement */
-class TemplateEnv {
-  private env: Map<string, string>;
-
-  constructor() {
-    this.env = new Map(Object.entries(loadSync({ export: true })));
-  }
-
-  get(name: string) {
-    return this.env.get(name) ?? Deno.env.get(name);
-  }
-  set(name: string, value: string) {
-    return this.env.set(name, value);
-  }
-
-  dump(envFile?: string): string {
-    return Array.from(this.env.entries())
-      .map((key, value) => `${key}="${value}"`)
-      .join("\n");
-  }
-}
-
-export interface BaseTemplate {
-  name: string;
-  runtimes: TemplateRuntime[];
-  options: TemplateOptions[];
-  beforeCreate?: (app: TemplateContext<this["options"]>) => Record<string, any>;
-  tools?: Tool[];
-  create: (app: TemplateBuiltContext<this["options"]>) => void;
-}
+import { BaseTemplate, commonQuestions } from "@boilerplate/core";
 
 interface CoreTemplate extends BaseTemplate {
   name: "core";
 }
+
+
+class Framework {
+    name: string;
+    frontend?: FrontendFramework;
+    meta?: MetaFramework[];
+    backend?: string[];
+    mobile?: string[];
+  
+    constructor(
+      name: string,
+      options: {
+        meta?: MetaFramework[];
+        frontend?: FrontendFramework;
+        backend?: string[];
+        mobile?: string[];
+      } = {},
+    ) {
+      this.name = name;
+      this.meta = options.meta;
+      this.backend = options.backend;
+      this.mobile = options.mobile;
+    }
+  }
+  
+  class FrontendFramework {
+      name: string;
+      vite?: boolean;
+      pkgName?: string;
+      scaffold?: () => void;
+  
+      constructor(name: string, options?: {
+          vite?: boolean,
+          pkgName?: string,
+          scaffold?: () => void;
+      }) {
+          this.name = name;
+          this.vite = options?.vite;
+          this.pkgName = options?.pkgName;
+          this.scaffold = options?.scaffold;
+      }
+  }
+  
+  class MetaFramework {
+    name: string;
+    pkgName?: string;
+    pkgScaffold?: (name: string) => void;
+  
+    constructor(name: string, scaffold?: string | ((name: string) => void)) {
+      this.name = name;
+      if (typeof scaffold === "string") this.pkgName = scaffold;
+      else this.pkgScaffold = scaffold;
+    }
+  }
+  
 
 const frameworks = {
     react: {
@@ -176,9 +93,14 @@ const frameworks = {
         }, {
             name: 'Ionic',
             scaffoldOnOwn: true,
+            scaffold: (options) => {
+                
+            }
         }]
     },
-    preact: {},
+    preact: {
+        name: 'Preact'
+    },
     angular: {},
     vue: {},
     solid: {},
@@ -358,57 +280,4 @@ export function defineCoreTemplate(): CoreTemplate {
       // expo app will need to be created and then diffed, and tsconfig.json would be merged
     },
   };
-}
-
-class Framework {
-  name: string;
-  frontend?: FrontendFramework;
-  meta?: MetaFramework[];
-  backend?: string[];
-  mobile?: string[];
-
-  constructor(
-    name: string,
-    options: {
-      meta?: MetaFramework[];
-      frontend?: FrontendFramework;
-      backend?: string[];
-      mobile?: string[];
-    } = {},
-  ) {
-    this.name = name;
-    this.meta = options.meta;
-    this.backend = options.backend;
-    this.mobile = options.mobile;
-  }
-}
-
-class FrontendFramework {
-    name: string;
-    vite?: boolean;
-    pkgName?: string;
-    scaffold?: () => void;
-
-    constructor(name: string, options?: {
-        vite?: boolean,
-        pkgName?: string,
-        scaffold?: () => void;
-    }) {
-        this.name = name;
-        this.vite = options?.vite;
-        this.pkgName = options?.pkgName;
-        this.scaffold = options?.scaffold;
-    }
-}
-
-class MetaFramework {
-  name: string;
-  pkgName?: string;
-  pkgScaffold?: (name: string) => void;
-
-  constructor(name: string, scaffold?: string | ((name: string) => void)) {
-    this.name = name;
-    if (typeof scaffold === "string") this.pkgName = scaffold;
-    else this.pkgScaffold = scaffold;
-  }
 }

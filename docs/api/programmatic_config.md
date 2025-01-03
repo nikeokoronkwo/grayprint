@@ -58,7 +58,7 @@ export default defineTemplate({
 
         // use tools
         // you can use this for programmatic operations of tools
-        app.use(app.builtinTools.eslint, {
+        app.use(app.tools.eslint, {
 
         });
 

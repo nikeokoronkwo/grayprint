@@ -14,7 +14,7 @@ const flags: {
         type: 'boolean',
         usage: 'Prints out help information'
     },
-    'type': {
+    'template': {
         type: 'string',
         alias: 't',
         usage: 'Specifies a template to use to generate boilerplate code'
@@ -52,4 +52,3 @@ if (args.help) {
 }
 
 // run basic template
-

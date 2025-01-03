@@ -3,6 +3,9 @@
     "./cli",
     "./packages/*"
   ],
+  "tasks": {
+    "dev": "deno run -A cli/main.ts"
+  },
   "fmt": {
     "semiColons": true
   },
