@@ -4,9 +4,15 @@ import prompt from "npm:prompts"
 import { optionToPrompt } from "./runner/questionnaire.ts";
 import { getValue } from "./utils/getValue.ts";
 import { buildContext } from "./runner/context.ts";
+import { Application } from "./app.ts";
+import { TemplateType } from "./plugin.ts";
+import { TemplatePackageManager } from "../../packages/core/mod.ts";
 
 /** Runs a template */
-export async function runTemplate(template: BaseTemplate, options?: {}) {
+export async function runTemplate(template: BaseTemplate, options?: {
+    type: TemplateType,
+    cwd?: string
+}) {
     // first of all, get the template name
     const templName = template.name;
 
@@ -19,22 +25,44 @@ export async function runTemplate(template: BaseTemplate, options?: {}) {
     // todo: arrange the ones with 'dependsOn' before the given option,
     const optResults = await prompt(optionPrompts);
 
-    console.info(optResults)
-
     // get all the values from each questionnaire, and assign it as a value to an object
     // make this the config object
-    const config: Record<string, string | boolean | string[]> = {};
+    let config: Record<string, string | boolean | string[]> = {};
     for (const [key, value] of Object.entries(optResults)) {
         config[key] = getValue(key, value, opts);
     }
+
+    if (!config['runtime'] && template.runtimes.length === 1) config['runtime'] = template.runtimes[0];
 
     // create a pre-application context
     const preContext = buildContext(config, opts);
     // run the beforeCreate command with the given context
     const addedConfig = template.beforeCreate ? await template.beforeCreate(preContext) : {};
+    config = { ...config, ...addedConfig };
 
     // build the application context
-    
+    const context = template.beforeCreate ? new Application({
+        templateType: options?.type ?? TemplateType.Core,
+        typescript: Object.keys(preContext.config).includes('typescript') ? preContext.config['typescript'] : false,
+        runtime: preContext.config['runtime'],
+        cwd: options?.cwd ?? Deno.cwd(),
+        config
+    }) :  Application.fromContext(preContext, {
+        templateType: options?.type ?? TemplateType.Core
+    });
+
+    if (template.runtimes.length === 1) {
+        const v = template.runtimes[0];
+        if (v === 'node') {
+            if (config['packageManager'] || config['package_manager']) context.addPackageManager((config['packageManager'] || config['package_manager']).toString().toLowerCase() as TemplatePackageManager);
+            else context.addPackageManager('npm');
+        } 
+    } else if (config['packageManager'] || config['package_manager']) {
+        const v = ((config['packageManager'] || config['package_manager']) as string).toLowerCase() as TemplatePackageManager;
+        context.addPackageManager(v);
+    }
+
     // run the app with the create command
     // this includes: building and running any tools used
+    const app = template.create(context);
 }

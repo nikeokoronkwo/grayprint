@@ -4,110 +4,6 @@ interface CoreTemplate extends BaseTemplate {
   name: "core";
 }
 
-
-class Framework {
-    name: string;
-    frontend?: FrontendFramework;
-    meta?: MetaFramework[];
-    backend?: string[];
-    mobile?: string[];
-  
-    constructor(
-      name: string,
-      options: {
-        meta?: MetaFramework[];
-        frontend?: FrontendFramework;
-        backend?: string[];
-        mobile?: string[];
-      } = {},
-    ) {
-      this.name = name;
-      this.meta = options.meta;
-      this.backend = options.backend;
-      this.mobile = options.mobile;
-    }
-  }
-  
-  class FrontendFramework {
-      name: string;
-      vite?: boolean;
-      pkgName?: string;
-      scaffold?: () => void;
-  
-      constructor(name: string, options?: {
-          vite?: boolean,
-          pkgName?: string,
-          scaffold?: () => void;
-      }) {
-          this.name = name;
-          this.vite = options?.vite;
-          this.pkgName = options?.pkgName;
-          this.scaffold = options?.scaffold;
-      }
-  }
-  
-  class MetaFramework {
-    name: string;
-    pkgName?: string;
-    pkgScaffold?: (name: string) => void;
-  
-    constructor(name: string, scaffold?: string | ((name: string) => void)) {
-      this.name = name;
-      if (typeof scaffold === "string") this.pkgName = scaffold;
-      else this.pkgScaffold = scaffold;
-    }
-  }
-  
-
-const frameworks = {
-    react: {
-        name: 'React',
-        meta: [{
-            name: 'NextJS',
-            // When scaffolding nextjs app, run deno install afterwards
-            scaffold: (options) => {
-                return [
-                    ...options.packageInstaller, 'create-next',
-                    options['tailwind'] ? '--tailwind' : '--no-tailwind',
-                    options['eslint'] ? '--eslint' : '--no-eslint',
-                    options['typescript'] ? '--typescript' : '--javascript',
-                    options.packageManager === 'deno' ? '--skip-install' : `--use-${options.packageManager}`
-                ].join(' ');
-            }
-        }, {
-            name: 'Remix',
-            scaffold: (options) => {
-                return [
-                    ...options.commands.create, 'remix',
-                    '-y', options.config['name'],
-                    '--no-git-init', '--package-manager', options.packageManager
-                ].join(' ');
-            }
-        }],
-        apps: [{
-            name: 'React Native',
-            scaffoldOnOwn: true, 
-            scaffold: (options) => {
-                // todo
-            }
-        }, {
-            name: 'Ionic',
-            scaffoldOnOwn: true,
-            scaffold: (options) => {
-                
-            }
-        }]
-    },
-    preact: {
-        name: 'Preact'
-    },
-    angular: {},
-    vue: {},
-    solid: {},
-    qwik: {},
-    vanilla: {},
-}
-
 export function defineCoreTemplate(): CoreTemplate {
   const frontendOptions = [
     "React",
@@ -127,6 +23,11 @@ export function defineCoreTemplate(): CoreTemplate {
       {
         name: "name",
         question: "What is the name of your project?",
+        validate: v => {
+          if (v.length <= 1 || v === '') return 'You must specify a valid name for your project (at least two characters)'
+          else if (v.includes(' ')) return 'You cannot have a name with spaces, use "_" to separate'
+          else return true;
+        }
       },
       {
         name: "frontend",
@@ -170,6 +71,7 @@ export function defineCoreTemplate(): CoreTemplate {
     beforeCreate: async (app) => {
       let meta;
       let backend;
+      let swc;
 
       // get a metaframework
       if (app.config["vite"] === "No") {
@@ -218,6 +120,13 @@ export function defineCoreTemplate(): CoreTemplate {
               options: metaOptions,
             });
         }
+      } else if (app.config['frontend'] === 'React') {
+        swc = app.question({
+          name: 'swc',
+          question: 'Will you be using React with SWC?',
+          type: "boolean",
+          default: false
+        })
       }
 
       // check if the user wants to integrate a mobile application
@@ -266,12 +175,16 @@ export function defineCoreTemplate(): CoreTemplate {
     tools: [],
     create: (app) => {
       console.log(`Building ${app.config["name"]}`);
+      // check necessary options
 
       // scaffold application
 
       // scaffold framework
       if (app.config['vite'] !== 'No') {
+        const templ = getViteTemplate(app.config['frontend'], app.config['typescript'], )
         // scaffold vite application
+        if (app.config['vite'] === 'SSR') app.run(...app.commands.create, app.runtime === 'deno' ? 'npm:create-vite@latest' : 'vite@latest', templ)
+        else app.run(...app.commands.create, app.runtime === 'deno' ? 'npm:create-vite-extra@latest' : 'vite-extra@latest', templ)
       } else {
         // scaffold metaframework
       }
@@ -280,4 +193,8 @@ export function defineCoreTemplate(): CoreTemplate {
       // expo app will need to be created and then diffed, and tsconfig.json would be merged
     },
   };
+}
+
+function getViteTemplate(name: string, typescript: boolean, reactSwc?: boolean): string {
+  return name.toLowerCase() + (reactSwc ? '-swc' : '') + (typescript ? '-ts' : '');
 }

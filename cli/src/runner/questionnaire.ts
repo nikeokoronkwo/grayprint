@@ -34,6 +34,7 @@ export function optionToPrompt(option: TemplateOptions, options: TemplateOptions
             type: 'text',
             name: option.name,
             message: option.question,
+            validate: option.type === 'string' || Object.keys(option).includes('validate') ? option.validate : undefined
         };
     }
 }

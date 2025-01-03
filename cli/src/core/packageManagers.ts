@@ -1,7 +1,14 @@
-import { TemplateCommands } from "../../../packages/core/mod.ts";
+import { TemplateCommands, TemplatePackageManager } from "@boilerplate/core";
 import * as env from "./environments.ts";
+import type { Runtime } from "./environments.ts";
 
-export const NPM = {
+interface PM {
+    name: TemplatePackageManager,
+    commands: TemplateCommands,
+    runtime: Runtime
+}
+
+export const NPM: PM = {
     name: 'npm',
     runtime: env.NODE,
     commands: {
@@ -15,10 +22,10 @@ export const NPM = {
             dev: 'save-dev',
             exact: 'save-exact'
         }
-    } as TemplateCommands
+    }
 }
 
-export const PNPM = {
+export const PNPM: PM = {
     name: 'pnpm',
     runtime: env.NODE,
     commands: {
@@ -34,7 +41,7 @@ export const PNPM = {
         }
     } as TemplateCommands
 }
-export const YARN = {
+export const YARN: PM = {
     name: 'yarn',
     runtime: env.NODE,
     commands: {
@@ -49,7 +56,7 @@ export const YARN = {
         }
     } as TemplateCommands
 }
-export const DENO = {
+export const DENO: PM = {
     name: 'deno',
     runtime: env.DENO,
     commands: {
@@ -65,7 +72,7 @@ export const DENO = {
         }
     } as TemplateCommands
 }
-export const BUN = {
+export const BUN: PM = {
     name: 'bun',
     runtime: env.BUN,
     commands: {

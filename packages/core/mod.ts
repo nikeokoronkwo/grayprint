@@ -1,8 +1,14 @@
 import { loadSync } from "jsr:@std/dotenv";
 
+/** Template JavaScript Runtimes that can be used with boilerplate */
 export type TemplateRuntime = "deno" | "node" | "bun";
+
+/** Template Package Managers that can be used with boilerplate */
 export type TemplatePackageManager = "deno" | "bun" | "npm" | "pnpm" | "yarn";
+
 type TemplateOptionType = "string" | "boolean" | "list";
+
+
 interface BaseTemplateOptions<T extends TemplateOptionType> {
   name: string;
   question: string;
@@ -12,7 +18,10 @@ interface BaseTemplateOptions<T extends TemplateOptionType> {
   /** Whether the option is a secure option, like a password */
   secure?: boolean;
 }
+
 export interface StringTemplateOptions extends BaseTemplateOptions<"string"> {
+  /** A function that can be used to check whether a given value is correct or not */
+  validate?: (value: string) => string | boolean;
   default?: string;
 }
 export interface BooleanTemplateOptions extends BaseTemplateOptions<"boolean"> {
@@ -23,10 +32,29 @@ export interface ListTemplateOptions<T extends string = string>
   options: T[] | ((v: T) => T[]);
   multiple?: boolean;
 }
+
+/**
+ * # Template Options
+ * Template options are objects used to denote queries/questions that are run by boilerplate to receive user input from the command line.
+ * 
+ * This can be used for configuring your templates with user-defined information.
+ * 
+ * Template Options can represent either String Values, Boolean Values, Select Options or MultiSelect Options (both of the latter representing list values, the last when `multiple` set to true)
+ * 
+ * ```ts
+ * {
+ *   name: 'name', // the name of the given option
+ *   question: 'What is the name of your project', // the question to ask
+ * }
+ * ```
+ * 
+ * By default, all options are assumed to be {@link StringTemplateOptions} (unless an `options` field is specified, which makes it a {@link ListTemplateOptions})
+ */
 export type TemplateOptions = StringTemplateOptions |
   BooleanTemplateOptions |
   ListTemplateOptions;
 
+/** Common questions that users can use as {@link TemplateOptions} in projects */
 export const commonQuestions: {
   platform: TemplateOptions;
   typescript: TemplateOptions;
@@ -45,7 +73,7 @@ export const commonQuestions: {
     default: true,
   },
   packageManager: {
-    name: "package_manager",
+    name: "packageManager",
     question: "What package manager do you want to use?",
     type: "list",
     dependsOn: "platform",
@@ -67,6 +95,10 @@ export interface TemplateContext<T extends TemplateOptions[] = []> {
   question: (q: TemplateOptions) => PromiseLike<string | boolean | string[]>;
   // deno-lint-ignore no-explicit-any
   log: (msg: any) => void;
+
+  error: (msg: any) => void;
+
+  cwd?: string;
 }
 export interface TemplateCommands {
   install: string[],
@@ -92,6 +124,9 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   path: TemplatePaths;
   copyFile: (from: string, dest: string) => void;
   copyDir: (from: string, dest: string) => void;
+  createDir: (dir: string) => void;
+  createFile: (file: string, contents?: string) => void;
+  writeFile: (file: string, contents?: string) => void;
   commands: TemplateCommands;
   tools: {
     tailwind: BaseTool,
@@ -115,7 +150,7 @@ export class TemplateEnv {
   private env: Map<string, string>;
 
   constructor() {
-    this.env = new Map(Object.entries(loadSync({ export: true })));
+    this.env = new Map();
   }
 
   get(name: string) {

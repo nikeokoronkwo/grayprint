@@ -15,7 +15,11 @@ export function buildContext(config: TemplateConfig, options: TemplateOptions[])
             return getValue(r[0], r[1], optionsContext);
         },
         config,
-        /** @todo Better logger */
-        log: console.log
+        /** @todo Better logger for `log` and `error` */
+        log: console.log,
+        error(msg) {
+            console.error(msg);
+            throw new Error(msg);
+        }
     }
 }

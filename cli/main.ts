@@ -56,8 +56,6 @@ if (args.help) {
     Deno.exit(0);
 }
 
-console.log(args);
-
 // run basic template
 /** @todo Find a better way to do this */
 const template: BaseTemplate = args.template ? (getTemplateType(args.template) === TemplateType.Builtin ? getBuiltinTemplate(args.template) : getTemplate(getTemplateUrl(args.template))) : defineCoreTemplate();
