@@ -151,6 +151,7 @@ export function defineCoreTemplate(): CoreTemplate {
     "Solid",
     "Qwik",
     "Vanilla",
+    "Angular",
   ];
   return {
     name: "core",
@@ -200,49 +201,51 @@ export function defineCoreTemplate(): CoreTemplate {
 
       // get a metaframework
       if (app.config["vite"] === "No") {
-        if (app.config["frontend"] === "vanilla") {
+        if (app.config["frontend"] === "Vanilla") {
           backend = app.question({
             name: "backend",
             question: "What backend framework do you want to use?",
             options: ["express", app.config["platform"] ?? "isomorphic"],
           });
-        }
-
-        let metaOptions: string[] = [];
-        switch (app.config["frontend"]) {
-          case "React":
-            metaOptions = ["NextJS", "Remix", "Gatsby"];
-            break;
-          case "Svelte":
-            meta = "SvelteKit";
-            app.log(`Metaframework defaulting to ${meta}...`);
-            break;
-          case "Vue":
-            meta = "Nuxt";
-            app.log(`Metaframework defaulting to ${meta}...`);
-            break;
-          case "Solid":
-            meta = "Nuxt";
-            app.log(`Metaframework defaulting to ${meta}...`);
-            break;
-          case "Qwik":
-            meta = "QwikCity";
-            app.log(`Metaframework defaulting to ${meta}...`);
-            break;
-          case "Preact":
-            if (app.config["platform"] === "deno") {
-              (meta = "Fresh"),
-                app.log(`Metaframework defaulting to ${meta}...`);
+        } else if (app.config["frontend"] === "Angular") {
+          // angular options
+        } else {
+          let metaOptions: string[] = [];
+          switch (app.config["frontend"]) {
+            case "React":
+              metaOptions = ["NextJS", "Remix", "Gatsby"];
               break;
-            }
-        }
+            case "Svelte":
+              meta = "SvelteKit";
+              app.log(`Metaframework defaulting to ${meta}...`);
+              break;
+            case "Vue":
+              meta = "Nuxt";
+              app.log(`Metaframework defaulting to ${meta}...`);
+              break;
+            case "Solid":
+              meta = "Nuxt";
+              app.log(`Metaframework defaulting to ${meta}...`);
+              break;
+            case "Qwik":
+              meta = "QwikCity";
+              app.log(`Metaframework defaulting to ${meta}...`);
+              break;
+            case "Preact":
+              if (app.config["platform"] === "deno") {
+                (meta = "Fresh"),
+                  app.log(`Metaframework defaulting to ${meta}...`);
+                break;
+              }
+          }
 
-        if (!meta || metaOptions.length !== 0)
-          meta = app.question({
-            name: "metaframework",
-            question: "What metaframework do you want to use?",
-            options: metaOptions,
-          });
+          if (!meta || metaOptions.length !== 0)
+            meta = app.question({
+              name: "metaframework",
+              question: "What metaframework do you want to use?",
+              options: metaOptions,
+            });
+        }
       }
 
       // check if the user wants to integrate a mobile application
@@ -293,6 +296,42 @@ export function defineCoreTemplate(): CoreTemplate {
       console.log(`Building ${app.config["name"]}`);
 
       // scaffold application
+      // scaffold framework
     },
   };
+}
+
+class Framework {
+  name: string;
+  frontend?: string;
+  meta?: string[];
+  backend?: string[];
+  mobile?: string[];
+
+  constructor(
+    name: string,
+    options: {
+      meta?: string[];
+      frontend?: string;
+      backend?: string[];
+      mobile?: string[];
+    } = {},
+  ) {
+    this.name = name;
+    this.meta = options.meta;
+    this.backend = options.backend;
+    this.mobile = options.mobile;
+  }
+}
+
+class MetaFramework {
+  name: string;
+  pkgName?: string;
+  pkgScaffold?: (name: string) => void;
+
+  constructor(name: string, scaffold: string | ((name: string) => void)) {
+    this.name = name;
+    if (typeof scaffold === "string") this.pkgName = scaffold;
+    else this.pkgScaffold = scaffold;
+  }
 }
