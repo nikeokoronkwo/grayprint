@@ -6,20 +6,23 @@ import { optionToPrompt } from "./questionnaire.ts";
 import { getValue } from "../utils/getValue.ts";
 import { TemplateConfig } from "../utils/config.ts";
 
-export function buildContext(config: TemplateConfig, options: TemplateOptions[]): TemplateContext {
-    return {
-        async question(q) {
-            const optionsContext = options.concat(q)
-            const result = await prompts(optionToPrompt(q, optionsContext));
-            const [r] = Object.entries(result);
-            return getValue(r[0], r[1], optionsContext);
-        },
-        config,
-        /** @todo Better logger for `log` and `error` */
-        log: console.log,
-        error(msg) {
-            console.error(msg);
-            throw new Error(msg);
-        }
-    }
+export function buildContext(
+  config: TemplateConfig,
+  options: TemplateOptions[],
+): TemplateContext {
+  return {
+    async question(q) {
+      const optionsContext = options.concat(q);
+      const result = await prompts(optionToPrompt(q, optionsContext));
+      const [r] = Object.entries(result);
+      return getValue(r[0], r[1], optionsContext);
+    },
+    config,
+    /** @todo Better logger for `log` and `error` */
+    log: console.log,
+    error(msg) {
+      console.error(msg);
+      throw new Error(msg);
+    },
+  };
 }

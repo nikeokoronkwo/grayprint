@@ -1,5 +1,5 @@
-import type { BaseTemplate, BaseTool } from "@boilerplate/core"
-export { commonQuestions } from "@boilerplate/core"
+import type { BaseTemplate, BaseTool } from "@boilerplate/core";
+export { commonQuestions } from "@boilerplate/core";
 
 export interface Template extends BaseTemplate {}
 

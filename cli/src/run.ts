@@ -1,6 +1,6 @@
 import { BaseTemplate, ListTemplateOptions } from "@boilerplate/core";
 // @deno-types="npm:@types/prompts"
-import prompt from "npm:prompts"
+import prompt from "npm:prompts";
 import { optionToPrompt } from "./runner/questionnaire.ts";
 import { getValue } from "./utils/getValue.ts";
 import { buildContext } from "./runner/context.ts";
@@ -10,59 +10,73 @@ import { TemplatePackageManager } from "../../packages/core/mod.ts";
 
 /** Runs a template */
 export async function runTemplate(template: BaseTemplate, options?: {
-    type: TemplateType,
-    cwd?: string
+  type: TemplateType;
+  cwd?: string;
 }) {
-    // first of all, get the template name
-    const templName = template.name;
+  // first of all, get the template name
+  const templName = template.name;
 
-    // get the options 
-    const opts = template.options;
-    const optionPrompts = opts.map((o, _, a) => optionToPrompt(o, a));
+  // get the options
+  const opts = template.options;
+  const optionPrompts = opts.map((o, _, a) => optionToPrompt(o, a));
 
-    // run questionnaire based on options
-    // todo: start with those without a 'dependsOn',
-    // todo: arrange the ones with 'dependsOn' before the given option,
-    const optResults = await prompt(optionPrompts);
+  // run questionnaire based on options
+  // todo: start with those without a 'dependsOn',
+  // todo: arrange the ones with 'dependsOn' before the given option,
+  const optResults = await prompt(optionPrompts);
 
-    // get all the values from each questionnaire, and assign it as a value to an object
-    // make this the config object
-    let config: Record<string, string | boolean | string[]> = {};
-    for (const [key, value] of Object.entries(optResults)) {
-        config[key] = getValue(key, value, opts);
-    }
+  // get all the values from each questionnaire, and assign it as a value to an object
+  // make this the config object
+  let config: Record<string, string | boolean | string[]> = {};
+  for (const [key, value] of Object.entries(optResults)) {
+    config[key] = getValue(key, value, opts);
+  }
 
-    if (!config['runtime'] && template.runtimes.length === 1) config['runtime'] = template.runtimes[0];
+  if (!config["runtime"] && template.runtimes.length === 1) {
+    config["runtime"] = template.runtimes[0];
+  }
 
-    // create a pre-application context
-    const preContext = buildContext(config, opts);
-    // run the beforeCreate command with the given context
-    const addedConfig = template.beforeCreate ? await template.beforeCreate(preContext) : {};
-    config = { ...config, ...addedConfig };
+  // create a pre-application context
+  const preContext = buildContext(config, opts);
+  // run the beforeCreate command with the given context
+  const addedConfig = template.beforeCreate
+    ? await template.beforeCreate(preContext)
+    : {};
+  config = { ...config, ...addedConfig };
 
-    // build the application context
-    const context = template.beforeCreate ? new Application({
-        templateType: options?.type ?? TemplateType.Core,
-        typescript: Object.keys(preContext.config).includes('typescript') ? preContext.config['typescript'] : false,
-        runtime: preContext.config['runtime'],
-        cwd: options?.cwd ?? Deno.cwd(),
-        config
-    }) :  Application.fromContext(preContext, {
-        templateType: options?.type ?? TemplateType.Core
+  // build the application context
+  const context = template.beforeCreate
+    ? new Application({
+      templateType: options?.type ?? TemplateType.Core,
+      typescript: Object.keys(preContext.config).includes("typescript")
+        ? preContext.config["typescript"]
+        : false,
+      runtime: preContext.config["runtime"],
+      cwd: options?.cwd ?? Deno.cwd(),
+      config,
+    })
+    : Application.fromContext(preContext, {
+      templateType: options?.type ?? TemplateType.Core,
     });
 
-    if (template.runtimes.length === 1) {
-        const v = template.runtimes[0];
-        if (v === 'node') {
-            if (config['packageManager'] || config['package_manager']) context.addPackageManager((config['packageManager'] || config['package_manager']).toString().toLowerCase() as TemplatePackageManager);
-            else context.addPackageManager('npm');
-        } 
-    } else if (config['packageManager'] || config['package_manager']) {
-        const v = ((config['packageManager'] || config['package_manager']) as string).toLowerCase() as TemplatePackageManager;
-        context.addPackageManager(v);
+  if (template.runtimes.length === 1) {
+    const v = template.runtimes[0];
+    if (v === "node") {
+      if (config["packageManager"] || config["package_manager"]) {
+        context.addPackageManager(
+          (config["packageManager"] || config["package_manager"]).toString()
+            .toLowerCase() as TemplatePackageManager,
+        );
+      } else context.addPackageManager("npm");
     }
+  } else if (config["packageManager"] || config["package_manager"]) {
+    const v =
+      ((config["packageManager"] || config["package_manager"]) as string)
+        .toLowerCase() as TemplatePackageManager;
+    context.addPackageManager(v);
+  }
 
-    // run the app with the create command
-    // this includes: building and running any tools used
-    const app = template.create(context);
+  // run the app with the create command
+  // this includes: building and running any tools used
+  const app = template.create(context);
 }

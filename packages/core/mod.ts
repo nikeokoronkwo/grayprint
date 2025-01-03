@@ -8,7 +8,6 @@ export type TemplatePackageManager = "deno" | "bun" | "npm" | "pnpm" | "yarn";
 
 type TemplateOptionType = "string" | "boolean" | "list";
 
-
 interface BaseTemplateOptions<T extends TemplateOptionType> {
   name: string;
   question: string;
@@ -36,23 +35,24 @@ export interface ListTemplateOptions<T extends string = string>
 /**
  * # Template Options
  * Template options are objects used to denote queries/questions that are run by boilerplate to receive user input from the command line.
- * 
+ *
  * This can be used for configuring your templates with user-defined information.
- * 
+ *
  * Template Options can represent either String Values, Boolean Values, Select Options or MultiSelect Options (both of the latter representing list values, the last when `multiple` set to true)
- * 
+ *
  * ```ts
  * {
  *   name: 'name', // the name of the given option
  *   question: 'What is the name of your project', // the question to ask
  * }
  * ```
- * 
+ *
  * By default, all options are assumed to be {@link StringTemplateOptions} (unless an `options` field is specified, which makes it a {@link ListTemplateOptions})
  */
-export type TemplateOptions = StringTemplateOptions |
-  BooleanTemplateOptions |
-  ListTemplateOptions;
+export type TemplateOptions =
+  | StringTemplateOptions
+  | BooleanTemplateOptions
+  | ListTemplateOptions;
 
 /** Common questions that users can use as {@link TemplateOptions} in projects */
 export const commonQuestions: {
@@ -85,9 +85,13 @@ export const commonQuestions: {
     },
   },
 };
-export type DefaultValue<T extends TemplateOptions> = T["type"] extends "string" ? string : T["type"] extends "boolean" ? boolean : T["type"] extends "list" ? string[] : string;
+export type DefaultValue<T extends TemplateOptions> = T["type"] extends "string"
+  ? string
+  : T["type"] extends "boolean" ? boolean
+  : T["type"] extends "list" ? string[]
+  : string;
 type TemplateConfig<T extends TemplateOptions[]> = {
-  [K in T[number]as K["name"]]: DefaultValue<K> | undefined;
+  [K in T[number] as K["name"]]: DefaultValue<K> | undefined;
 };
 export interface TemplateContext<T extends TemplateOptions[] = []> {
   config: TemplateConfig<T>;
@@ -101,16 +105,16 @@ export interface TemplateContext<T extends TemplateOptions[] = []> {
   cwd?: string;
 }
 export interface TemplateCommands {
-  install: string[],
-  create: string[],
-  run: string[],
-  exec: string[],
-  start: string[],
-  remove: string[],
+  install: string[];
+  create: string[];
+  run: string[];
+  exec: string[];
+  start: string[];
+  remove: string[];
   mappings: {
-    dev: string,
-    exact: string
-  }
+    dev: string;
+    exact: string;
+  };
 }
 export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   extends TemplateContext<T> {
@@ -129,11 +133,11 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   writeFile: (file: string, contents?: string) => void;
   commands: TemplateCommands;
   tools: {
-    tailwind: BaseTool,
-    eslint: BaseTool,
-    sass: BaseTool,
-    prettier: BaseTool
-  }
+    tailwind: BaseTool;
+    eslint: BaseTool;
+    sass: BaseTool;
+    prettier: BaseTool;
+  };
 }
 
 export interface TemplatePaths {
@@ -142,8 +146,7 @@ export interface TemplatePaths {
 /**
  * Defines a Tool
  */
-export interface BaseTool { 
-
+export interface BaseTool {
 }
 /** @todo Implement */
 export class TemplateEnv {
@@ -171,7 +174,9 @@ export interface BaseTemplate {
   name: string;
   runtimes: TemplateRuntime[];
   options: TemplateOptions[];
-  beforeCreate?: (app: TemplateContext<this["options"]>) => Promise<Record<string, any>> | Record<string, any>;
+  beforeCreate?: (
+    app: TemplateContext<this["options"]>,
+  ) => Promise<Record<string, any>> | Record<string, any>;
   tools?: BaseTool[];
   create: (app: TemplateBuiltContext<this["options"]>) => void;
 }

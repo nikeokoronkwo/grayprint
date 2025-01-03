@@ -4,38 +4,36 @@ import { loadConfig } from "npm:c12";
 import { BaseTemplate } from "@boilerplate/core";
 
 export enum TemplateType {
-    Core, // only one template: main template
-    Builtin,
-    Path,
-    Github,
-    NPM,
-    JSR,
+  Core, // only one template: main template
+  Builtin,
+  Path,
+  Github,
+  NPM,
+  JSR,
 }
 
 /**
  * Get the URL for the template identified
- * @param identifier 
+ * @param identifier
  */
 export function getTemplateUrl(identifier: string): URL {
-    // basic: URL of file path
-    // 
-    throw new Error('Unimplemented')
+  // basic: URL of file path
+  //
+  throw new Error("Unimplemented");
 }
 
 /**
  * Get the Template contents as a string
- * @param identifier 
+ * @param identifier
  */
 export function getTemplateType(identifier: string): TemplateType {
-    throw new Error('Unimplemented')
+  throw new Error("Unimplemented");
 }
 
 export function getBuiltinTemplate(identifier: string): BaseTemplate {
-    throw new Error('Unimplemented')
-
+  throw new Error("Unimplemented");
 }
 
 export function getTemplate(url: URL): BaseTemplate {
-    throw new Error('Unimplemented')
-
+  throw new Error("Unimplemented");
 }

@@ -12,7 +12,7 @@ class Framework {
       frontend?: FrontendFramework;
       backend?: string[];
       mobile?: string[];
-    } = {}
+    } = {},
   ) {
     this.name = name;
     this.meta = options.meta;
@@ -50,44 +50,51 @@ class MetaFramework {
 }
 const frameworks = {
   react: {
-    name: 'React',
+    name: "React",
     meta: [{
-      name: 'NextJS',
+      name: "NextJS",
       // When scaffolding nextjs app, run deno install afterwards
       scaffold: (options) => {
         return [
-          ...options.packageInstaller, 'create-next',
-          options['tailwind'] ? '--tailwind' : '--no-tailwind',
-          options['eslint'] ? '--eslint' : '--no-eslint',
-          options['typescript'] ? '--typescript' : '--javascript',
-          options.packageManager === 'deno' ? '--skip-install' : `--use-${options.packageManager}`
-        ].join(' ');
-      }
+          ...options.packageInstaller,
+          "create-next",
+          options["tailwind"] ? "--tailwind" : "--no-tailwind",
+          options["eslint"] ? "--eslint" : "--no-eslint",
+          options["typescript"] ? "--typescript" : "--javascript",
+          options.packageManager === "deno"
+            ? "--skip-install"
+            : `--use-${options.packageManager}`,
+        ].join(" ");
+      },
     }, {
-      name: 'Remix',
+      name: "Remix",
       scaffold: (options) => {
         return [
-          ...options.commands.create, 'remix',
-          '-y', options.config['name'],
-          '--no-git-init', '--package-manager', options.packageManager
-        ].join(' ');
-      }
+          ...options.commands.create,
+          "remix",
+          "-y",
+          options.config["name"],
+          "--no-git-init",
+          "--package-manager",
+          options.packageManager,
+        ].join(" ");
+      },
     }],
     apps: [{
-      name: 'React Native',
+      name: "React Native",
       scaffoldOnOwn: true,
       scaffold: (options) => {
         // todo
-      }
+      },
     }, {
-      name: 'Ionic',
+      name: "Ionic",
       scaffoldOnOwn: true,
       scaffold: (options) => {
-      }
-    }]
+      },
+    }],
   },
   preact: {
-    name: 'Preact'
+    name: "Preact",
   },
   angular: {},
   vue: {},

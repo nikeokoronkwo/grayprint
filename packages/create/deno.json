@@ -1,4 +1,4 @@
 {
-    "name": "@boilerplate/create",
-    "exports": "./mod.ts"
+  "name": "@boilerplate/create",
+  "exports": "./mod.ts"
 }

@@ -1,4 +1,4 @@
 {
-    "name": "@boilerplate/core",
-    "exports": "./mod.ts"
+  "name": "@boilerplate/core",
+  "exports": "./mod.ts"
 }

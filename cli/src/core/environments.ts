@@ -1,17 +1,17 @@
 import { TemplateRuntime } from "@boilerplate/core";
 
 export interface Runtime {
-    name: TemplateRuntime
+  name: TemplateRuntime;
 }
 
 export const NODE: Runtime = {
-    name: 'node',
-}
+  name: "node",
+};
 
 export const BUN: Runtime = {
-    name: 'node',
-}
+  name: "node",
+};
 
 export const DENO: Runtime = {
-    name: 'node',
-}
+  name: "node",
+};

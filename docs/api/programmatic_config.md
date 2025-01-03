@@ -1,10 +1,11 @@
 ## Programmatic config
 
 ### Template
+
 1. JS compiles basic parts
 2. Go runs processes
 3. JS Compiles beforeCreate with app object
-4. Go receives data and runs command 
+4. Go receives data and runs command
 5. JS Compiles create
 6. Go receives it and runs create command
 7. JS receives tools
@@ -79,8 +80,8 @@ export default defineTemplate({
 ```
 
 ### Tool
-```js
 
+```js
 import { defineTool } from "@boilerplate/create";
 
 export default defineTool({
@@ -129,3 +130,4 @@ export default defineTool<InputOptions, OutputConfig>({
         // get typescript intellisense
     }
 })
+```

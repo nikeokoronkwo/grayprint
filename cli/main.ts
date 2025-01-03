@@ -1,30 +1,35 @@
-import { parseArgs } from "jsr:@std/cli"
+import { parseArgs } from "jsr:@std/cli";
 import { defineCoreTemplate } from "./src/builtin/core.ts";
-import { getBuiltinTemplate, getTemplate, getTemplateType, getTemplateUrl, TemplateType } from "./src/plugin.ts";
+import {
+  getBuiltinTemplate,
+  getTemplate,
+  getTemplateType,
+  getTemplateUrl,
+  TemplateType,
+} from "./src/plugin.ts";
 import { runTemplate } from "./src/run.ts";
-import { BaseTemplate } from "../packages/core/mod.ts";
-import prompts from "npm:prompts";
+import { BaseTemplate } from "@boilerplate/core";
 
-type FlagType = 'boolean' | 'string' | 'list'
+type FlagType = "boolean" | "string" | "list";
 
 const flags: {
-    [k: string]: {
-        type: FlagType,
-        alias?: string,
-        required?: boolean,
-        usage?: string
-    }
+  [k: string]: {
+    type: FlagType;
+    alias?: string;
+    required?: boolean;
+    usage?: string;
+  };
 } = {
-    'help': {
-        type: 'boolean',
-        usage: 'Prints out help information'
-    },
-    'template': {
-        type: 'string',
-        alias: 't',
-        usage: 'Specifies a template to use to generate boilerplate code'
-    }
-}
+  help: {
+    type: "boolean",
+    usage: "Prints out help information",
+  },
+  template: {
+    type: "string",
+    alias: "t",
+    usage: "Specifies a template to use to generate boilerplate code",
+  },
+};
 const flagEntries = Object.entries(flags);
 
 /**
@@ -32,32 +37,46 @@ const flagEntries = Object.entries(flags);
  * @param args The arguments from the command line
  */
 function parseArguments(args: string[]) {
-    return parseArgs(args, {
-        string: flagEntries.filter(([k, v]) => v.type === 'string').map(([k, v]) => k),
-        boolean: flagEntries.filter(([k, v]) => v.type === 'boolean').map(([k, v]) => k),
-        alias: flagEntries.filter(([k,v]) => v.alias).reduce((a, [k, v]) => ({ ...a, [k]: v.alias }), {})
-    });
+  return parseArgs(args, {
+    string: flagEntries
+      .filter(([k, v]) => v.type === "string")
+      .map(([k, v]) => k),
+    boolean: flagEntries
+      .filter(([k, v]) => v.type === "boolean")
+      .map(([k, v]) => k),
+    alias: flagEntries
+      .filter(([k, v]) => v.alias)
+      .reduce((a, [k, v]) => ({ ...a, [k]: v.alias }), {}),
+  });
 }
 
 /** Print out command line usage */
 function printUsage() {
-    console.log('%cBoilerplate', 'text-decoration: underline');
-    console.log('\nUsage: boilerplate [flags] [directory]')
-    console.log('\n%cFlags:', 'font-weight: bold')
-    for (const [flag, info] of flagEntries) {
-        console.log(`\t${info.alias ? '-'+info.alias+',' : '   '} --${flag}\t\t${info.usage ?? ''}`)
-    }
+  console.log("%cBoilerplate", "text-decoration: underline");
+  console.log("\nUsage: boilerplate [flags] [directory]");
+  console.log("\n%cFlags:", "font-weight: bold");
+  for (const [flag, info] of flagEntries) {
+    console.log(
+      `\t${info.alias ? "-" + info.alias + "," : "   "} --${flag}\t\t${
+        info.usage ?? ""
+      }`,
+    );
+  }
 }
 
 // Get command line arguments
 const args = parseArguments(Deno.args);
 if (args.help) {
-    printUsage();
-    Deno.exit(0);
+  printUsage();
+  Deno.exit(0);
 }
 
 // run basic template
 /** @todo Find a better way to do this */
-const template: BaseTemplate = args.template ? (getTemplateType(args.template) === TemplateType.Builtin ? getBuiltinTemplate(args.template) : getTemplate(getTemplateUrl(args.template))) : defineCoreTemplate();
+const template: BaseTemplate = args.template
+  ? getTemplateType(args.template) === TemplateType.Builtin
+    ? getBuiltinTemplate(args.template)
+    : getTemplate(getTemplateUrl(args.template))
+  : defineCoreTemplate();
 
 await runTemplate(template);
