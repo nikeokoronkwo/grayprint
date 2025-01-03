@@ -57,32 +57,51 @@ export const commonQuestions: {
     },
   },
 };
-type DefaultValue<T extends TemplateOptions> = T["type"] extends "string" ? string : T["type"] extends "boolean" ? boolean : T["type"] extends "list" ? string[] : string;
+export type DefaultValue<T extends TemplateOptions> = T["type"] extends "string" ? string : T["type"] extends "boolean" ? boolean : T["type"] extends "list" ? string[] : string;
 type TemplateConfig<T extends TemplateOptions[]> = {
   [K in T[number]as K["name"]]: DefaultValue<K> | undefined;
 };
-export interface TemplateContext<T extends TemplateOptions[]> {
+export interface TemplateContext<T extends TemplateOptions[] = []> {
   config: TemplateConfig<T>;
   /** Run a cli question for the given  */
-  question: (q: TemplateOptions) => DefaultValue<typeof q>;
+  question: (q: TemplateOptions) => PromiseLike<string | boolean | string[]>;
   // deno-lint-ignore no-explicit-any
   log: (msg: any) => void;
 }
-export interface TemplateBuiltContext<T extends TemplateOptions[]>
+export interface TemplateCommands {
+  install: string[],
+  create: string[],
+  run: string[],
+  exec: string[],
+  start: string[],
+  remove: string[],
+  mappings: {
+    dev: string,
+    exact: string
+  }
+}
+export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   extends TemplateContext<T> {
   env: TemplateEnv;
   typescript: boolean;
   runtime: TemplateRuntime;
   packageManager: TemplatePackageManager;
-  use: (tool: Tool) => void;
+  use: (tool: BaseTool) => void;
   install: (tool: string) => void;
   run: (...args: string[]) => void;
   path: TemplatePaths;
   copyFile: (from: string, dest: string) => void;
   copyDir: (from: string, dest: string) => void;
+  commands: TemplateCommands;
+  tools: {
+    tailwind: BaseTool,
+    eslint: BaseTool,
+    sass: BaseTool,
+    prettier: BaseTool
+  }
 }
 
-interface TemplatePaths {
+export interface TemplatePaths {
   ROOT: string;
 }
 /**
@@ -92,7 +111,7 @@ export interface BaseTool {
 
 }
 /** @todo Implement */
-class TemplateEnv {
+export class TemplateEnv {
   private env: Map<string, string>;
 
   constructor() {
@@ -117,13 +136,7 @@ export interface BaseTemplate {
   name: string;
   runtimes: TemplateRuntime[];
   options: TemplateOptions[];
-  beforeCreate?: (app: TemplateContext<this["options"]>) => Record<string, any>;
-  tools?: Tool[];
+  beforeCreate?: (app: TemplateContext<this["options"]>) => Promise<Record<string, any>> | Record<string, any>;
+  tools?: BaseTool[];
   create: (app: TemplateBuiltContext<this["options"]>) => void;
-  tools: {
-    tailwind: BaseTool,
-    eslint: BaseTool,
-    sass: BaseTool,
-    prettier: BaseTool
-  }
 }

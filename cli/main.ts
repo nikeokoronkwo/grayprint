@@ -1,5 +1,5 @@
 import { parseArgs } from "jsr:@std/cli"
-import { defineCoreTemplate } from "./src/template.ts";
+import { defineCoreTemplate } from "./src/builtin/core.ts";
 import { getBuiltinTemplate, getTemplate, getTemplateType, getTemplateUrl, TemplateType } from "./src/plugin.ts";
 import { runTemplate } from "./src/run.ts";
 import { BaseTemplate } from "../packages/core/mod.ts";

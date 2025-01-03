@@ -5,8 +5,11 @@ import { BaseTemplate } from "../../packages/core/mod.ts";
 
 export enum TemplateType {
     Core, // only one template: main template
-    Github,
     Builtin,
+    Path,
+    Github,
+    NPM,
+    JSR,
 }
 
 /**

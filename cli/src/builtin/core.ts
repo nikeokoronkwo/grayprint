@@ -167,14 +167,14 @@ export function defineCoreTemplate(): CoreTemplate {
         default: true
       }
     ],
-    beforeCreate: (app) => {
+    beforeCreate: async (app) => {
       let meta;
       let backend;
 
       // get a metaframework
       if (app.config["vite"] === "No") {
         if (app.config["frontend"] === "Vanilla") {
-          backend = app.question({
+          backend = await app.question({
             name: "backend",
             question: "What backend framework do you want to use?",
             options: ["express", app.config["platform"] ?? "isomorphic"],
@@ -212,7 +212,7 @@ export function defineCoreTemplate(): CoreTemplate {
           }
 
           if (!meta || metaOptions.length !== 0)
-            meta = app.question({
+            meta = await app.question({
               name: "metaframework",
               question: "What metaframework do you want to use?",
               options: metaOptions,
@@ -222,7 +222,7 @@ export function defineCoreTemplate(): CoreTemplate {
 
       // check if the user wants to integrate a mobile application
       let mobile_framework;
-      const mobile = app.question({
+      const mobile = await app.question({
         name: "application",
         question: "Do you want to make a mobile application as well?",
         type: "boolean",
@@ -248,7 +248,7 @@ export function defineCoreTemplate(): CoreTemplate {
           default:
             break;
         }
-        const mobile_framework = app.question({
+        const mobile_framework = await app.question({
           name: "mobile_framework",
           question: "What mobile application framework do you want to use?",
           type: "list",
