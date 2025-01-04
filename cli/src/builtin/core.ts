@@ -109,10 +109,10 @@ export function defineCoreTemplate(): CoreTemplate {
               break;
             case "Preact":
               if (app.config["platform"] === "deno") {
-                (meta = "Fresh"),
+                  meta = "Fresh";
                   app.log(`Metaframework defaulting to ${meta}...`);
-                break;
               }
+              break;
           }
 
           if (!meta || metaOptions.length !== 0) {
@@ -124,7 +124,7 @@ export function defineCoreTemplate(): CoreTemplate {
           }
         }
       } else if (app.config["frontend"] === "React") {
-        swc = app.question({
+        swc = await app.question({
           name: "swc",
           question: "Will you be using React with SWC?",
           type: "boolean",
@@ -148,7 +148,6 @@ export function defineCoreTemplate(): CoreTemplate {
             mobile_framework_options.push(
               "React Native",
               "Ionic",
-              "NativeScript",
             );
             break;
           case "Vue":
@@ -208,6 +207,24 @@ export function defineCoreTemplate(): CoreTemplate {
 
       // scaffold application if any
       // expo app will need to be created and then diffed, and tsconfig.json would be merged
+
+      // add styling libraries
+      switch (app.config['styles']) {
+        case 'Tailwind':
+          app.use(app.tools.tailwind);
+          break;
+        case 'Sass':
+          app.use(app.tools.sass);
+          break;
+        default:
+          break;
+      }
+      if (app.config['prettier']) app.use(app.tools.prettier);
+      if (app.config['eslint']) app.use(app.tools.eslint, {
+        prettier: app.config["prettier"],
+      });
+      
+      if (app.git) app.initGit();
     },
   };
 }

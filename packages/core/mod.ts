@@ -1,5 +1,3 @@
-import { loadSync } from "jsr:@std/dotenv";
-
 /** Template JavaScript Runtimes that can be used with boilerplate */
 export type TemplateRuntime = "deno" | "node" | "bun";
 
@@ -120,6 +118,7 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   extends TemplateContext<T> {
   env: TemplateEnv;
   typescript: boolean;
+  git: boolean;
   runtime: TemplateRuntime;
   packageManager: TemplatePackageManager;
   use: (tool: BaseTool) => void;
@@ -138,6 +137,7 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
     sass: BaseTool;
     prettier: BaseTool;
   };
+  initGit(): void;
 }
 
 export interface TemplatePaths {
@@ -171,12 +171,29 @@ export class TemplateEnv {
 }
 
 export interface BaseTemplate {
+  /** The name of the template */
   name: string;
+  
+  /** The runtimes that can be used with this template */
   runtimes: TemplateRuntime[];
+
+  /** The options that can be used with this template */
   options: TemplateOptions[];
+
+  cfg?: {
+    typescript?: boolean;
+    packageManager?: TemplatePackageManager;
+    git?: boolean;
+  }
+
+  /** The beforeCreate command for this template */
   beforeCreate?: (
     app: TemplateContext<this["options"]>,
   ) => Promise<Record<string, any>> | Record<string, any>;
+
+  /** The tools that can be used with this template */
   tools?: BaseTool[];
+
+  /** The create command for this template */
   create: (app: TemplateBuiltContext<this["options"]>) => void;
 }
