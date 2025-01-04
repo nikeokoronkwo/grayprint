@@ -4,7 +4,7 @@ export { commonQuestions } from "@grayprint/core";
 
 export interface Template extends BaseTemplate {}
 
-export interface Tool<T = Record<string, any>> extends BaseTool<T> {}
+export interface Tool<T = {}> extends BaseTool<T> {}
 
 /**
  * A function used for defining a grayprint template
@@ -20,6 +20,6 @@ export function defineTemplate(template: Template): Template {
  * @param tool
  * @returns
  */
-export function defineTool<T = Record<string, any>>(tool: Tool<T>): Tool<T> {
+export function defineTool<T = {}>(tool: Tool<T>): Tool<T> {
   return tool;
 }

@@ -18,6 +18,7 @@ export function defineCoreTemplate(): CoreTemplate {
   return {
     name: "core",
     runtimes: ["deno", "bun", "node"],
+    autoInstallDeps: true,
     options: [
       commonQuestions.name,
       commonQuestions.platform,

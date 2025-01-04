@@ -4,7 +4,7 @@ import type { Runtime } from "./environments.ts";
 
 interface PM {
   name: TemplatePackageManager;
-  commands: TemplateCommands;
+  commands: TemplateCommands & { installDeps: string[] };
   runtime: Runtime;
 }
 
@@ -18,6 +18,7 @@ export const NPM: PM = {
     run: ["npx"],
     exec: ["npx"],
     start: ["npm", "run"],
+    installDeps: ["npm", "install"],
     mappings: {
       dev: "save-dev",
       exact: "save-exact",
@@ -35,11 +36,12 @@ export const PNPM: PM = {
     run: ["pnpm", "dlx"],
     exec: ["pnpm", "exec"],
     start: ["pnpm"],
+    installDeps: ["pnpm", "install"],
     mappings: {
       dev: "save-dev",
       exact: "save-exact",
     },
-  } as TemplateCommands,
+  },
 };
 export const YARN: PM = {
   name: "yarn",
@@ -50,11 +52,13 @@ export const YARN: PM = {
     run: ["yarn", "dlx"],
     exec: ["yarn"],
     start: ["yarn"],
+    remove: ["yarn", "remove"],
+    installDeps: ["npm", "install"],
     mappings: {
       dev: "dev",
       exact: "exact",
     },
-  } as TemplateCommands,
+  },
 };
 export const DENO: PM = {
   name: "deno",
@@ -66,11 +70,12 @@ export const DENO: PM = {
     exec: ["deno", "run", "-A"],
     start: ["deno", "task"],
     remove: ["deno", "remove"],
+    installDeps: ["deno", "install"],
     mappings: {
       dev: "dev",
       exact: "", // no exact
     },
-  } as TemplateCommands,
+  },
 };
 export const BUN: PM = {
   name: "bun",
@@ -81,9 +86,11 @@ export const BUN: PM = {
     run: ["bun", "x"],
     exec: ["bun"],
     start: ["bun", "run"],
+    remove: ["bun", "remove"],
+    installDeps: ["bun", "install"],
     mappings: {
       dev: "dev",
       exact: "exact",
     },
-  } as TemplateCommands,
+  },
 };

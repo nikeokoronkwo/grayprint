@@ -19,6 +19,7 @@ export function buildContext<T extends TemplateOptions[] = TemplateOptions[]>(
       return getValue(r[0], r[1], optionsContext);
     },
     config,
+    configFile: {},
     /** @todo Better logger for `log` and `error` */
     log: console.log,
     error(msg) {

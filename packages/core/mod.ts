@@ -117,6 +117,8 @@ export interface TemplateContext<T extends TemplateOptions[] = []> {
   error: (msg: any) => void;
 
   cwd?: string;
+
+  configFile: Record<string, any>;
 }
 export interface TemplateCommands {
   install: string[];
@@ -133,24 +135,37 @@ export interface TemplateCommands {
 
 export type ToolOptions<T extends BaseTool> = {};
 
+/**
+ * A mixin that contains shared functionality for built contexts used in tools and templates
+ */
+interface BuiltContext {
+  install: (tool: string, options?: {
+    dev?: boolean,
+    exact?: boolean
+  }) => Promise<void>;
+  installSync: (tool: string, options?: {
+    dev?: boolean,
+    exact?: boolean
+  }) => void;
+  run: (...args: string[]) => Promise<void>;
+  runSync: (...args: string[]) => void;
+  createDir: (dir: string) => void;
+  createFile: (file: string, contents?: string) => void;
+  writeFile: (file: string, contents: string) => void;
+  addScript: (name: string, cmd: string) => void;
+}
+
 export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
-  extends TemplateContext<T> {
+  extends TemplateContext<T>, BuiltContext {
   env: TemplateEnv;
   typescript: boolean;
   git: boolean;
   runtime: TemplateRuntime;
   packageManager: TemplatePackageManager;
   use: <T extends BaseTool = BaseTool>(tool: T, options?: ToolOptions<T>) => void;
-  install: (tool: string) => Promise<void>;
-  installSync: (tool: string) => void;
-  run: (...args: string[]) => Promise<void>;
-  runSync: (...args: string[]) => void;
   path: TemplatePaths;
   copyFile: (from: string, dest: string) => void;
   copyDir: (from: string, dest: string) => void;
-  createDir: (dir: string) => void;
-  createFile: (file: string, contents?: string) => void;
-  writeFile: (file: string, contents: string) => void;
   commands: TemplateCommands;
   tools: {
     tailwind: BaseTool;
@@ -166,15 +181,20 @@ export interface TemplatePaths {
   ROOT: string;
 }
 
-export interface TemplateToolContext<T> {
-  options: T
+export interface BaseToolOptions {
+  [k: string]: any;
+}
+
+export interface TemplateToolContext<T extends BaseToolOptions = BaseToolOptions> extends Omit<TemplateContext, 'config'>, BuiltContext {
+  options: T,
+  runtime: TemplateRuntime
 }
 /**
  * Defines a Tool
  */
-export interface BaseTool<T = Record<string, any>> {
+export interface BaseTool<T extends BaseToolOptions = BaseToolOptions> {
   name: string;
-  init: (context: TemplateToolContext<T>) => void;
+  init?: <U extends T = T>(context: TemplateToolContext<U>) => void;
 }
 /** @todo Implement */
 export class TemplateEnv {
@@ -224,4 +244,7 @@ export interface BaseTemplate {
 
   /** The create command for this template */
   create: (app: TemplateBuiltContext<this["options"]>) => Promise<void> | void;
+
+  /** Whether to automatically install dependencies after creating this template */
+  autoInstallDeps?: boolean
 }

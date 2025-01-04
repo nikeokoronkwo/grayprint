@@ -1,8 +1,10 @@
 import { blue, red } from "jsr:@std/fmt/colors";
 import { isAbsolute, join, relative } from "jsr:@std/path";
+import { exists } from "jsr:@std/fs/exists";
 
 import {
   BaseTool,
+  BaseToolOptions,
   TemplateBuiltContext,
   TemplateCommands,
   TemplateContext,
@@ -23,7 +25,7 @@ import sass from "../tools/sass.ts";
 import prettier from "../tools/prettier.ts";
 
 /** @todo Implement use tool */
-function runTool<T = Record<string, any>>(tool: BaseTool<T>, options: T, context?: TemplateContext): TemplateToolContext<T> {
+function runTool<T extends BaseToolOptions = BaseToolOptions>(tool: BaseTool<T>, options?: T, context?: TemplateContext): TemplateToolContext<T> {
   throw new Error("Unimplemented");
 }
 
@@ -34,6 +36,7 @@ export class Application<T extends TemplateConfig = TemplateConfig>
   implements TemplateBuiltContext {
   private templateType: TemplateType;
   private verbose: boolean;
+  private environment;
 
   constructor(options: {
     name: string
@@ -44,6 +47,7 @@ export class Application<T extends TemplateConfig = TemplateConfig>
     cwd?: string;
     verbose?: boolean;
     git?: boolean;
+    cfg?: Record<string, any>;
   }) {
     this.name = options.name;
     this.typescript = options.typescript;
@@ -59,8 +63,10 @@ export class Application<T extends TemplateConfig = TemplateConfig>
 
     /** @todo Default should be a function to infer runtime from available in path */
     this.runtime = options.runtime ?? (pm.NPM.runtime.name as TemplateRuntime);
-    this.packageManager = pm.NPM.name;
-    this.commands = pm.NPM.commands;
+    const newLocal = Object.entries(pm).find(([_, pm]) => pm.name === options.runtime)?.[1];
+    this.packageManager = newLocal?.name ?? pm.NPM.name;
+    this.commands = newLocal?.commands ?? pm.NPM.commands;
+    this.environment = newLocal ?? pm.NPM;
 
     this.env = new TemplateEnv();
     this.tools = {
@@ -69,6 +75,8 @@ export class Application<T extends TemplateConfig = TemplateConfig>
       sass,
       prettier,
     };
+
+    this.configFile = options.cfg ?? {};
   }
 
   static fromContext(
@@ -90,6 +98,7 @@ export class Application<T extends TemplateConfig = TemplateConfig>
       config: context.config,
       cwd: context.cwd,
       templateType: options?.templateType,
+      cfg: context.configFile
     });
   }
 
@@ -97,14 +106,43 @@ export class Application<T extends TemplateConfig = TemplateConfig>
     this.env = env;
   }
 
-  addPackageManager(pm: TemplatePackageManager) {
-    if (pm === "bun") {
+  addPackageManager(manager: TemplatePackageManager) {
+    if (manager === "bun") {
       this.runtime = "bun";
-    } else if (pm === "deno") {
+    } else if (manager === "deno") {
       this.runtime = "deno";
     } else {
       this.runtime = "node";
     }
+    const newLocal = Object.entries(pm).find(([_, p]) => p.name === manager)?.[1];
+    this.packageManager = newLocal!.name;
+    this.commands = newLocal!.commands;
+  }
+
+  async dumpConfig() {
+    if (!(await exists(join(this.cwd, this.configFileName)))) Deno.create(join(this.cwd, this.configFileName));
+    const contents = await Deno.readTextFile(join(this.cwd, this.configFileName));
+    let jsonContents = JSON.parse(contents);
+    jsonContents = {...jsonContents, ...this.configFile};
+    await Deno.writeTextFile(join(this.cwd, this.configFileName), JSON.stringify(jsonContents));
+  }
+
+  async installDependencies() {
+    return await this.run(...this.commands.installDeps);
+  }
+
+  private updateContext<T extends BaseToolOptions = BaseToolOptions>(res: TemplateToolContext<T>) {
+    throw new Error("Unimplemented");
+  }
+
+  private getInstallArgs(tool: string, options?: {
+    dev?: boolean,
+    exact?: boolean
+  }) {
+    const args = [...this.commands.install, tool];
+    if (options?.dev) args.push(`--${this.commands.mappings.dev}`);
+    if (options?.exact) args.push(`--${this.commands.mappings.exact}`);
+    return args;
   }
 
   name: string;
@@ -120,10 +158,14 @@ export class Application<T extends TemplateConfig = TemplateConfig>
     prettier: BaseTool;
   };
   config: T;
-  commands: TemplateCommands;
+  commands: TemplateCommands & { installDeps: string[] };
   cwd: string;
   git: boolean;
-
+  configFile: Record<string, any> = {};
+  
+  public get configFileName() : string {
+    return this.environment.runtime.configFile
+  }
 
   async initGit() {
     return await this.run("git", "init");
@@ -133,20 +175,22 @@ export class Application<T extends TemplateConfig = TemplateConfig>
   }
 
   /** @todo use tool */
-  use<T = Record<string, any>>(tool: BaseTool<T>, options?: T) {
-    const res = runTool(tool);
-    this.updateContext(res);
+  use<T extends BaseToolOptions = BaseToolOptions>(tool: BaseTool<T>, options?: T) {
+    const res = runTool<T>(tool);
+    this.updateContext<T>(res);
   }
 
-  private updateContext(res) {
-
+  async install(tool: string, options?: {
+    dev?: boolean,
+    exact?: boolean
+  }) {
+    return await this.run(...this.getInstallArgs(tool, options));
   }
-
-  async install(tool: string) {
-    return await this.run(...this.commands.install, tool);
-  }
-  installSync(tool: string) {
-    return this.runSync(...this.commands.install, tool);
+  installSync(tool: string, options?: {
+    dev?: boolean,
+    exact?: boolean
+  }) {
+    return this.runSync(...this.getInstallArgs(tool, options));
   }
 
   /** TODO: Verbose */
@@ -172,6 +216,20 @@ export class Application<T extends TemplateConfig = TemplateConfig>
     const { success, stderr, stdout } = command.outputSync();
 
     if (!success) this.error(new TextDecoder().decode(stderr));
+  }
+
+  addScript(name: string, cmd: string) {
+    if (this.runtime === 'deno') {
+      this.configFile['tasks'] = {
+        ...this.configFile['tasks'],
+        ...{[name]: cmd}
+      }
+    } else {
+      this.configFile['scripts'] = {
+        ...this.configFile['scripts'],
+        ...{[name]: cmd}
+      }
+    }
   }
 
   /** For these:

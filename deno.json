@@ -1,10 +1,14 @@
 {
   "workspace": [
     "./cli",
-    "./packages/*"
+    "./packages/core",
+    "./packages/create"
   ],
   "tasks": {
     "dev": "deno run -A cli/main.ts",
+    "build:bin": "deno compile --output bin/grayprint -A cli/main.ts ",
+    "build:npm": "deno run -A tools/npm.ts",
+    "install": "deno install -A cli/main.ts",
     "bump": "deno run -A jsr:@deno/bump-workspaces/cli"
   },
   "fmt": {

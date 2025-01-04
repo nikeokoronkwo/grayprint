@@ -78,4 +78,6 @@ export async function runTemplate(template: BaseTemplate, options?: {
   // run the app with the create command
   // this includes: building and running any tools used
   const app = await template.create(context);
+
+  if (template.autoInstallDeps) await context.installDependencies();
 }
