@@ -31,6 +31,6 @@ Boilerplate is also available as a binary that can be installed via [the release
 Making a custom template is simple. Your templates can be described with a `boilerplate.yaml` file, or programmatically with a `boilerplate.config.js` file.
 Boilerplate supports getting and using templates from the user's system (via path), Github (Public and Private Repositories), NPM, JSR, and direct URLs.
 
-For more information on making custom templates, [check out the documentation]().
+For more information on making custom templates, [check out the documentation](./docs/templates.md).
 
 You can also take a look at the templates used for [the builtin templates in `boilerplate`](./cli/src/core).
