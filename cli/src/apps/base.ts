@@ -11,6 +11,7 @@ import {
   TemplatePackageManager,
   TemplatePaths,
   TemplateRuntime,
+  TemplateToolContext,
 } from "@boilerplate/core";
 
 import { TemplateConfig } from "../utils/config.ts";
@@ -22,8 +23,8 @@ import sass from "../tools/sass.ts";
 import prettier from "../tools/prettier.ts";
 
 /** @todo Implement use tool */
-function runTool<T = Record<string, any>>(tool: BaseTool<T>) {
-
+function runTool<T = Record<string, any>>(tool: BaseTool<T>, options: T, context?: TemplateContext): TemplateToolContext<T> {
+  throw new Error("Unimplemented");
 }
 
 /**
@@ -152,15 +153,11 @@ export class Application<T extends TemplateConfig = TemplateConfig>
   async run(...args: string[]) {
     console.assert(args.length > 0, "Runner arguments must be at least one");
 
-    console.info(blue(args.join(',')))
-
     const command = new Deno.Command(args[0], /* !this.verbose ? */ {
       args: args.length === 1 ? [] : args.slice(1),
       cwd: this.cwd,
     } /* : { args: args.length === 1 ? [] : args.slice(1), cwd: this.cwd, stdin: 'piped', stdout: 'piped', stderr: 'piped' } */);
     const { success, stderr, stdout } = await command.output();
-
-    console.log(new TextDecoder().decode(stdout))
 
     if (!success) this.error(new TextDecoder().decode(stderr));
   }
@@ -168,15 +165,11 @@ export class Application<T extends TemplateConfig = TemplateConfig>
   runSync(...args: string[]) {
     console.assert(args.length > 0, "Runner arguments must be at least one");
 
-    console.info(blue(args.join(',')))
-
     const command = new Deno.Command(args[0], /* !this.verbose ? */ {
       args: args.length === 1 ? [] : args.slice(1),
       cwd: this.cwd,
     } /* : { args: args.length === 1 ? [] : args.slice(1), cwd: this.cwd, stdin: 'piped', stdout: 'piped', stderr: 'piped' } */);
     const { success, stderr, stdout } = command.outputSync();
-
-    console.log(new TextDecoder().decode(stdout))
 
     if (!success) this.error(new TextDecoder().decode(stderr));
   }

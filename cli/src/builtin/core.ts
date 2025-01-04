@@ -169,11 +169,13 @@ export function defineCoreTemplate(): CoreTemplate {
 
       // scaffold framework
       if (app.config["vite"] !== "No") {
+
+        // scaffold vite application
         const templ = getViteTemplate(
           app.config["frontend"] as string,
           app.config["typescript"] as boolean,
         );
-        // scaffold vite application
+
         if (app.config["vite"] === "SPA") {
           await app.run(
             ...app.commands.create,
@@ -185,8 +187,9 @@ export function defineCoreTemplate(): CoreTemplate {
         } else {
           app.error("Unsupported platform");
         }
+
       } else {
-        // scaffold metaframework
+        // todo: scaffold metaframework
       }
 
 
@@ -204,6 +207,8 @@ export function defineCoreTemplate(): CoreTemplate {
         default:
           break;
       }
+
+      // add tools
       if (app.config["prettier"]) app.use(app.tools.prettier);
       if (app.config["eslint"]) {
         app.use(app.tools.eslint, {
@@ -211,6 +216,7 @@ export function defineCoreTemplate(): CoreTemplate {
         }); 
       }
 
+      // install git
       if (app.git) app.initGit();
     },
   };
