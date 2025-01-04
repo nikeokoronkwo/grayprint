@@ -1,5 +1,5 @@
 {
-  "name": "@boilerplate/create",
+  "name": "@grayprint/create",
   "version": "0.0.1-pre",
   "exports": "./mod.ts"
 }

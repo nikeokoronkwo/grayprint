@@ -8,7 +8,7 @@ import {
   TemplateType,
 } from "./src/plugin.ts";
 import { runTemplate } from "./src/run.ts";
-import { BaseTemplate } from "@boilerplate/core";
+import { BaseTemplate } from "@grayprint/core";
 
 type FlagType = "boolean" | "string" | "list";
 
@@ -27,7 +27,7 @@ const flags: {
   template: {
     type: "string",
     alias: "t",
-    usage: "Specifies a template to use to generate boilerplate code",
+    usage: "Specifies a template to use to generate grayprint code",
   },
 };
 const flagEntries = Object.entries(flags);
@@ -52,8 +52,8 @@ function parseArguments(args: string[]) {
 
 /** Print out command line usage */
 function printUsage() {
-  console.log("%cBoilerplate", "text-decoration: underline");
-  console.log("\nUsage: boilerplate [flags] [directory]");
+  console.log("%cGrayprint", "text-decoration: underline");
+  console.log("\nUsage: grayprint [flags] [directory]");
   console.log("\n%cFlags:", "font-weight: bold");
   for (const [flag, info] of flagEntries) {
     console.log(

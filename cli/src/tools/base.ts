@@ -1,4 +1,4 @@
-import { BaseTool } from "@boilerplate/core";
+import { BaseTool } from "@grayprint/core";
 
 type BaseToolConfig = Record<string, any>;
 export interface CoreTool<T = BaseToolConfig> extends BaseTool<T> {

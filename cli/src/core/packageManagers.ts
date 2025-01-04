@@ -1,4 +1,4 @@
-import { TemplateCommands, TemplatePackageManager } from "@boilerplate/core";
+import { TemplateCommands, TemplatePackageManager } from "@grayprint/core";
 import * as env from "./environments.ts";
 import type { Runtime } from "./environments.ts";
 

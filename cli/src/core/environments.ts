@@ -1,4 +1,4 @@
-import { TemplateRuntime } from "@boilerplate/core";
+import { TemplateRuntime } from "@grayprint/core";
 
 export interface Runtime {
   name: TemplateRuntime;

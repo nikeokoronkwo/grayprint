@@ -1,7 +1,7 @@
 /** File used for loading and defining plugins */
 
 import { loadConfig } from "npm:c12";
-import { BaseTemplate } from "@boilerplate/core";
+import { BaseTemplate } from "@grayprint/core";
 
 export enum TemplateType {
   Core, // only one template: main template

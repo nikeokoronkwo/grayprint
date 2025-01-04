@@ -1,7 +1,7 @@
-/** Template JavaScript Runtimes that can be used with boilerplate */
+/** Template JavaScript Runtimes that can be used with grayprint */
 export type TemplateRuntime = "deno" | "node" | "bun";
 
-/** Template Package Managers that can be used with boilerplate */
+/** Template Package Managers that can be used with grayprint */
 export type TemplatePackageManager = "deno" | "bun" | "npm" | "pnpm" | "yarn";
 
 type TemplateOptionType = "string" | "boolean" | "list";
@@ -32,7 +32,7 @@ export interface ListTemplateOptions<T extends string = string>
 
 /**
  * # Template Options
- * Template options are objects used to denote queries/questions that are run by boilerplate to receive user input from the command line.
+ * Template options are objects used to denote queries/questions that are run by grayprint to receive user input from the command line.
  *
  * This can be used for configuring your templates with user-defined information.
  *

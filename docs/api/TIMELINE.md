@@ -1,8 +1,8 @@
-# Timeline for boilerplate
+# Timeline for grayprint
 
 ## 0.1.0
 
-- [ ] Initial Release of Boilerplate
+- [ ] Initial Release of Grayprint
 
 ## 0.2.0
 
@@ -18,4 +18,4 @@
 
 ## 0.6.0
 
-- [ ] Boilerplate Registry/Marketplace for templates
+- [ ] Grayprint Registry/Marketplace for templates

@@ -1,4 +1,4 @@
-import { ListTemplateOptions, TemplateOptions } from "@boilerplate/core";
+import { ListTemplateOptions, TemplateOptions } from "@grayprint/core";
 
 export function getValue(key: string, value: any, opts: TemplateOptions[]) {
   if (typeof value === "number") {

@@ -1,7 +1,7 @@
 ### Tool
 
 ```js
-import { defineTool } from "@boilerplate/create";
+import { defineTool } from "@grayprint/create";
 
 export default defineTool({
     name: 'Tool',

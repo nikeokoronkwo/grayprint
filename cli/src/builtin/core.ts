@@ -1,4 +1,4 @@
-import { BaseTemplate, commonQuestions } from "@boilerplate/core";
+import { BaseTemplate, commonQuestions } from "@grayprint/core";
 
 interface CoreTemplate extends BaseTemplate {
   name: "core";

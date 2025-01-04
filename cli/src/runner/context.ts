@@ -1,4 +1,4 @@
-import { TemplateContext, TemplateOptions, TemplateConfig } from "@boilerplate/core";
+import { TemplateContext, TemplateOptions, TemplateConfig } from "@grayprint/core";
 // @deno-types="npm:@types/prompts"
 import prompts from "npm:prompts";
 

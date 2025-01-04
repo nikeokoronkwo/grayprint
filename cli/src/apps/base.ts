@@ -12,7 +12,7 @@ import {
   TemplatePaths,
   TemplateRuntime,
   TemplateToolContext,
-} from "@boilerplate/core";
+} from "@grayprint/core";
 
 import { TemplateConfig } from "../utils/config.ts";
 import { TemplateType } from "../plugin.ts";

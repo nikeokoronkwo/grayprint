@@ -1,7 +1,7 @@
 # Templates
 
-Templates are what power boilerplate. They are the blueprint that shows and
-tells how boilerplate should
+Templates are what power grayprint. They are the blueprint that shows and
+tells how grayprint should
 
 Templates make it easy for you to scaffold a project, while also allowing you to
 easily configure a project.
@@ -19,38 +19,38 @@ templates with a JS/TS configuration file.
 Templates can be used by specifying them with the `-t` or `--template` flag.
 
 ```bash
-boilerplate # core template
-boilerplate -t static # static builtin template
-boilerplate -t ../main.js # Reads template from given file
-boilerplate -t ./core # Reads a `boilerplate.config.js` or `boilerplate.yaml` template file
-boilerplate -t zen # Reads a template from the Boilerplate Marketplace
-boilerplate -t npm:@nikeokoronkwo/bp-static # Reads a template from the NPM package "@nikeokoronkwo/bp-static"
-boilerplate -t gh:nikeokoronkwo/bp-static # Reads a template from the Github Repository "nikeokoronkwo/bp-static"
-boilerplate -t https://deno.land/x/nike/mod.ts # Reads a template from the file served at the given URL
+grayprint # core template
+grayprint -t static # static builtin template
+grayprint -t ../main.js # Reads template from given file
+grayprint -t ./core # Reads a `grayprint.config.js` or `grayprint.yaml` template file
+grayprint -t zen # Reads a template from the Grayprint Marketplace
+grayprint -t npm:@nikeokoronkwo/bp-static # Reads a template from the NPM package "@nikeokoronkwo/bp-static"
+grayprint -t gh:nikeokoronkwo/bp-static # Reads a template from the Github Repository "nikeokoronkwo/bp-static"
+grayprint -t https://deno.land/x/nike/mod.ts # Reads a template from the file served at the given URL
 ```
 
 <!-- Specify more options by  -->
 
 ## Creating your own Template
 
-Creating a boilerplate template can be done with the `@boilerplate/create`
+Creating a grayprint template can be done with the `@grayprint/create`
 package. This package is platform-agnostic, (as most of the APIs are implemented
 in the CLI) and available on JSR to use.
 
 To begin, install the package:
 
 ```bash
-deno add @boilerplate/create
-npx jsr add @boilerplate/create
-pnpm dlx jsr add @boilerplate/create
-yarn dlx jsr add @boilerplate/create
-bunx jsr add @boilerplate/create
+deno add @grayprint/create
+npx jsr add @grayprint/create
+pnpm dlx jsr add @grayprint/create
+yarn dlx jsr add @grayprint/create
+bunx jsr add @grayprint/create
 ```
 
-Then create a `boilerplate.config.js` file with the following:
+Then create a `grayprint.config.js` file with the following:
 
 ```js
-import { defineTemplate } from "@boilerplate/create";
+import { defineTemplate } from "@grayprint/create";
 
 export default defineTemplate({
   name: "my-template", // the name of the template
@@ -76,7 +76,7 @@ application, such as `packageManager` and `runtime` to get the needed/specified
 environment variables, as well as for creating `.env` files in the project, and
 `use` for making use of [tools]().
 
-<!-- You can also run `boilerplate -t template` to create a "boilerplate" template for you-->
+<!-- You can also run `grayprint -t template` to create a "grayprint" template for you-->
 
 For more information on the `defineTemplate` function,
 [check out the docs on JSR]().
@@ -88,7 +88,7 @@ of the template config file to the user's directory where his/her project is
 specified. This is a common practice used in most scaffolding applications.
 
 ```js
-import { defineTemplate } from "@boilerplate/create";
+import { defineTemplate } from "@grayprint/create";
 
 export default defineTemplate({
   name: "my-template", // the name of the template
@@ -103,7 +103,7 @@ export default defineTemplate({
 ### Extensive Example
 
 ```js
-import { defineTemplate, commonQuestions } from "@boilerplate/create";
+import { defineTemplate, commonQuestions } from "@grayprint/create";
 import { myTool } from "@example/myTool"
 
 export default defineTemplate({

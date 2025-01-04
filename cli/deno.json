@@ -1,4 +1,4 @@
 {
-  "name": "@boilerplate/cli",
+  "name": "@grayprint/cli",
   "exports": "./main.ts"
 }

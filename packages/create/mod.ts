@@ -1,13 +1,13 @@
 //deno-lint-ignore-file no-explicit-any
-import type { BaseTemplate, BaseTool } from "@boilerplate/core";
-export { commonQuestions } from "@boilerplate/core";
+import type { BaseTemplate, BaseTool } from "@grayprint/core";
+export { commonQuestions } from "@grayprint/core";
 
 export interface Template extends BaseTemplate {}
 
 export interface Tool<T = Record<string, any>> extends BaseTool<T> {}
 
 /**
- * A function used for defining a boilerplate template
+ * A function used for defining a grayprint template
  * @param template {Template} The template definition
  * @returns The template
  */
@@ -16,7 +16,7 @@ export function defineTemplate(template: Template): Template {
 }
 
 /**
- * A function used for defining a boilerplate tool
+ * A function used for defining a grayprint tool
  * @param tool
  * @returns
  */

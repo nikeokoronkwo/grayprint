@@ -1,4 +1,4 @@
-import { BaseTemplate, ListTemplateOptions, TemplateRuntime, TemplatePackageManager } from "@boilerplate/core";
+import { BaseTemplate, ListTemplateOptions, TemplateRuntime, TemplatePackageManager } from "@grayprint/core";
 // @deno-types="npm:@types/prompts"
 import prompt from "npm:prompts";
 import { optionToPrompt } from "./runner/questionnaire.ts";
