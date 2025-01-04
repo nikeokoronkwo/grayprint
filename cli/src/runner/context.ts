@@ -1,16 +1,17 @@
-import { TemplateContext, TemplateOptions } from "@boilerplate/core";
+import { TemplateContext, TemplateOptions, TemplateConfig } from "@boilerplate/core";
 // @deno-types="npm:@types/prompts"
 import prompts from "npm:prompts";
 
 import { optionToPrompt } from "./questionnaire.ts";
 import { getValue } from "../utils/getValue.ts";
-import { TemplateConfig } from "../utils/config.ts";
 
-export function buildContext(
-  config: TemplateConfig,
-  options: TemplateOptions[],
-): TemplateContext {
+export function buildContext<T extends TemplateOptions[] = TemplateOptions[]>(
+  name: string,
+  config: TemplateConfig<T>,
+  options: T,
+): TemplateContext<T> {
   return {
+    name,
     async question(q) {
       const optionsContext = options.concat(q);
       const result = await prompts(optionToPrompt(q, optionsContext));

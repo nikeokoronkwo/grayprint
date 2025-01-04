@@ -1,12 +1,11 @@
-import { BaseTemplate, ListTemplateOptions } from "@boilerplate/core";
+import { BaseTemplate, ListTemplateOptions, TemplateRuntime, TemplatePackageManager } from "@boilerplate/core";
 // @deno-types="npm:@types/prompts"
 import prompt from "npm:prompts";
 import { optionToPrompt } from "./runner/questionnaire.ts";
 import { getValue } from "./utils/getValue.ts";
 import { buildContext } from "./runner/context.ts";
-import { Application } from "./app.ts";
+import { Application } from "./apps/base.ts";
 import { TemplateType } from "./plugin.ts";
-import { TemplatePackageManager } from "../../packages/core/mod.ts";
 
 /** Runs a template */
 export async function runTemplate(template: BaseTemplate, options?: {
@@ -37,7 +36,7 @@ export async function runTemplate(template: BaseTemplate, options?: {
   }
 
   // create a pre-application context
-  const preContext = buildContext(config, opts);
+  const preContext = buildContext(templName, config, opts);
   // run the beforeCreate command with the given context
   const addedConfig = template.beforeCreate
     ? await template.beforeCreate(preContext)
@@ -47,13 +46,13 @@ export async function runTemplate(template: BaseTemplate, options?: {
   // build the application context
   const context = template.beforeCreate
     ? new Application({
+      name: templName,
       templateType: options?.type ?? TemplateType.Core,
-      typescript: Object.keys(preContext.config).includes("typescript")
-        ? preContext.config["typescript"]
-        : false,
-      runtime: preContext.config["runtime"],
+      typescript: preContext.config["typescript"] as boolean | undefined ?? false,
+      runtime: preContext.config["runtime"] as TemplateRuntime,
       cwd: options?.cwd ?? Deno.cwd(),
       config,
+      git: preContext.config['git'] as boolean | undefined ?? true
     })
     : Application.fromContext(preContext, {
       templateType: options?.type ?? TemplateType.Core,
@@ -78,5 +77,5 @@ export async function runTemplate(template: BaseTemplate, options?: {
 
   // run the app with the create command
   // this includes: building and running any tools used
-  const app = template.create(context);
+  const app = await template.create(context);
 }

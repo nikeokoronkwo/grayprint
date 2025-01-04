@@ -1,9 +1,10 @@
+//deno-lint-ignore-file no-explicit-any
 import type { BaseTemplate, BaseTool } from "@boilerplate/core";
 export { commonQuestions } from "@boilerplate/core";
 
 export interface Template extends BaseTemplate {}
 
-export interface Tool extends BaseTool {}
+export interface Tool<T = Record<string, any>> extends BaseTool<T> {}
 
 /**
  * A function used for defining a boilerplate template
@@ -19,6 +20,6 @@ export function defineTemplate(template: Template): Template {
  * @param tool
  * @returns
  */
-export function defineTool(tool: Tool): Tool {
+export function defineTool<T = Record<string, any>>(tool: Tool<T>): Tool<T> {
   return tool;
 }

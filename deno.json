@@ -4,7 +4,8 @@
     "./packages/*"
   ],
   "tasks": {
-    "dev": "deno run -A cli/main.ts"
+    "dev": "deno run -A cli/main.ts",
+    "bump": "deno run -A jsr:@deno/bump-workspaces/cli"
   },
   "fmt": {
     "semiColons": true

@@ -19,18 +19,9 @@ export function defineCoreTemplate(): CoreTemplate {
     name: "core",
     runtimes: ["deno", "bun", "node"],
     options: [
+      commonQuestions.name,
       commonQuestions.platform,
-      {
-        name: "name",
-        question: "What is the name of your project?",
-        validate: (v) => {
-          if (v.length <= 1 || v === "") {
-            return "You must specify a valid name for your project (at least two characters)";
-          } else if (v.includes(" ")) {
-            return 'You cannot have a name with spaces, use "_" to separate';
-          } else return true;
-        },
-      },
+      commonQuestions.packageManager,
       {
         name: "frontend",
         question: "What frontend framework do you want to use?",
@@ -63,12 +54,7 @@ export function defineCoreTemplate(): CoreTemplate {
         type: "boolean",
         default: true,
       },
-      {
-        name: "git",
-        question: "Do you want to use Git for your project?",
-        type: "boolean",
-        default: true,
-      },
+      commonQuestions.git,
     ],
     beforeCreate: async (app) => {
       let meta;
@@ -81,7 +67,7 @@ export function defineCoreTemplate(): CoreTemplate {
           backend = await app.question({
             name: "backend",
             question: "What backend framework do you want to use?",
-            options: ["express", app.config["platform"] ?? "isomorphic"],
+            options: ["express", app.config["platform"] as string ?? "isomorphic"],
           });
         } else if (app.config["frontend"] === "Angular") {
           // angular options
@@ -109,8 +95,8 @@ export function defineCoreTemplate(): CoreTemplate {
               break;
             case "Preact":
               if (app.config["platform"] === "deno") {
-                  meta = "Fresh";
-                  app.log(`Metaframework defaulting to ${meta}...`);
+                meta = "Fresh";
+                app.log(`Metaframework defaulting to ${meta}...`);
               }
               break;
           }
@@ -175,7 +161,7 @@ export function defineCoreTemplate(): CoreTemplate {
     },
     /** @todo Make tools like eslint 'tools' rather than 'options' */
     tools: [],
-    create: (app) => {
+    create: async (app) => {
       console.log(`Building ${app.config["name"]}`);
       // check necessary options
 
@@ -184,46 +170,47 @@ export function defineCoreTemplate(): CoreTemplate {
       // scaffold framework
       if (app.config["vite"] !== "No") {
         const templ = getViteTemplate(
-          app.config["frontend"],
-          app.config["typescript"],
+          app.config["frontend"] as string,
+          app.config["typescript"] as boolean,
         );
         // scaffold vite application
-        if (app.config["vite"] === "SSR") {
-          app.run(
+        if (app.config["vite"] === "SPA") {
+          await app.run(
             ...app.commands.create,
-            app.runtime === "deno" ? "npm:create-vite@latest" : "vite@latest",
+            app.runtime === "deno" ? "npm:create-vite@latest" : "vite@latest", ...(app.packageManager === 'npm' ? ['--'] : []),
+            '-t', 
             templ,
+            app.config['name'] as string,
           );
-        } else {app.run(
-            ...app.commands.create,
-            app.runtime === "deno"
-              ? "npm:create-vite-extra@latest"
-              : "vite-extra@latest",
-            templ,
-          );}
+        } else {
+          app.error("Unsupported platform");
+        }
       } else {
         // scaffold metaframework
       }
+
 
       // scaffold application if any
       // expo app will need to be created and then diffed, and tsconfig.json would be merged
 
       // add styling libraries
-      switch (app.config['styles']) {
-        case 'Tailwind':
+      switch (app.config["styles"]) {
+        case "Tailwind":
           app.use(app.tools.tailwind);
           break;
-        case 'Sass':
+        case "Sass":
           app.use(app.tools.sass);
           break;
         default:
           break;
       }
-      if (app.config['prettier']) app.use(app.tools.prettier);
-      if (app.config['eslint']) app.use(app.tools.eslint, {
-        prettier: app.config["prettier"],
-      });
-      
+      if (app.config["prettier"]) app.use(app.tools.prettier);
+      if (app.config["eslint"]) {
+        app.use(app.tools.eslint, {
+          prettier: app.config["prettier"],
+        }); 
+      }
+
       if (app.git) app.initGit();
     },
   };

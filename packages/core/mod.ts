@@ -54,10 +54,23 @@ export type TemplateOptions =
 
 /** Common questions that users can use as {@link TemplateOptions} in projects */
 export const commonQuestions: {
+  name: TemplateOptions;
   platform: TemplateOptions;
   typescript: TemplateOptions;
   packageManager: TemplateOptions;
+  git: TemplateOptions;
 } = {
+  name: {
+          name: "name",
+          question: "What is the name of your project?",
+          validate: (v) => {
+            if (v.length <= 1 || v === "") {
+              return "You must specify a valid name for your project (at least two characters)";
+            } else if (v.includes(" ")) {
+              return 'You cannot have a name with spaces, use "_" to separate';
+            } else return true;
+          },
+        },
   platform: {
     name: "platform",
     question: "What platform are you designing for?",
@@ -75,23 +88,26 @@ export const commonQuestions: {
     question: "What package manager do you want to use?",
     type: "list",
     dependsOn: "platform",
-    options: (v) => {
-      const items = ["npm", "pnpm", "yarn"];
-      if (v === "bun") items.push("bun");
-      else if (v === "deno") items.push("deno");
-      return items;
-    },
+    options: ['npm', 'pnpm', 'yarn', 'bun', 'deno'],
   },
+  git: {
+    name: "git",
+    question: "Do you want to use Git for your project?",
+    type: "boolean",
+    default: true,
+  }
 };
 export type DefaultValue<T extends TemplateOptions> = T["type"] extends "string"
   ? string
   : T["type"] extends "boolean" ? boolean
   : T["type"] extends "list" ? string[]
-  : string;
-type TemplateConfig<T extends TemplateOptions[]> = {
+  : (string | boolean | string[]);
+export type TemplateConfig<T extends TemplateOptions[]> = {
   [K in T[number] as K["name"]]: DefaultValue<K> | undefined;
 };
 export interface TemplateContext<T extends TemplateOptions[] = []> {
+  name: string;
+  
   config: TemplateConfig<T>;
   /** Run a cli question for the given  */
   question: (q: TemplateOptions) => PromiseLike<string | boolean | string[]>;
@@ -114,6 +130,9 @@ export interface TemplateCommands {
     exact: string;
   };
 }
+
+export type ToolOptions<T extends BaseTool> = {};
+
 export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   extends TemplateContext<T> {
   env: TemplateEnv;
@@ -121,15 +140,17 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   git: boolean;
   runtime: TemplateRuntime;
   packageManager: TemplatePackageManager;
-  use: (tool: BaseTool) => void;
-  install: (tool: string) => void;
-  run: (...args: string[]) => void;
+  use: <T extends BaseTool = BaseTool>(tool: T, options?: ToolOptions<T>) => void;
+  install: (tool: string) => Promise<void>;
+  installSync: (tool: string) => void;
+  run: (...args: string[]) => Promise<void>;
+  runSync: (...args: string[]) => void;
   path: TemplatePaths;
   copyFile: (from: string, dest: string) => void;
   copyDir: (from: string, dest: string) => void;
   createDir: (dir: string) => void;
   createFile: (file: string, contents?: string) => void;
-  writeFile: (file: string, contents?: string) => void;
+  writeFile: (file: string, contents: string) => void;
   commands: TemplateCommands;
   tools: {
     tailwind: BaseTool;
@@ -137,16 +158,23 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
     sass: BaseTool;
     prettier: BaseTool;
   };
-  initGit(): void;
+  initGit(): Promise<void>;
+  initGitSync(): void;
 }
 
 export interface TemplatePaths {
   ROOT: string;
 }
+
+export interface TemplateToolContext<T> {
+  options: T
+}
 /**
  * Defines a Tool
  */
-export interface BaseTool {
+export interface BaseTool<T = Record<string, any>> {
+  name: string;
+  init: (context: TemplateToolContext<T>) => void;
 }
 /** @todo Implement */
 export class TemplateEnv {
@@ -173,7 +201,7 @@ export class TemplateEnv {
 export interface BaseTemplate {
   /** The name of the template */
   name: string;
-  
+
   /** The runtimes that can be used with this template */
   runtimes: TemplateRuntime[];
 
@@ -184,7 +212,7 @@ export interface BaseTemplate {
     typescript?: boolean;
     packageManager?: TemplatePackageManager;
     git?: boolean;
-  }
+  };
 
   /** The beforeCreate command for this template */
   beforeCreate?: (
@@ -195,5 +223,5 @@ export interface BaseTemplate {
   tools?: BaseTool[];
 
   /** The create command for this template */
-  create: (app: TemplateBuiltContext<this["options"]>) => void;
+  create: (app: TemplateBuiltContext<this["options"]>) => Promise<void> | void;
 }
