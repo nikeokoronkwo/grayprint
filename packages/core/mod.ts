@@ -280,10 +280,10 @@ export interface TemplateCommands {
   };
 }
 
-export type ToolOptions<T extends BaseTool> = {};
-
 /**
- * A mixin that contains shared functionality for built contexts used in tools and templates
+ * A mixin that contains shared functionality for built contexts used in tools and template
+ * 
+ * It mainly contains functions for installing tools and running commands on the user's project root
  */
 interface BuiltContext {
   install: (tool: string, options?: {
@@ -302,11 +302,32 @@ interface BuiltContext {
   addScript: (name: string, cmd: string) => void;
 }
 
+// TODO: Document
 export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   extends TemplateContext<T>, BuiltContext {
   env: TemplateEnv;
+  /** 
+   * Whether typescript is enabled for this project
+   * 
+   * This option can be set by either specifying in the `cfg` option in the `defineTemplate` function, or by prompting and specifying the option name to be `"typescript"`
+   * For prompting, you can make use of {@link commonQuestions.typescript}
+   */
   typescript: boolean;
+
+  /** 
+   * Whether git is enabled for this project
+   * 
+   * This option can be set by either specifying in the `cfg` option in the `defineTemplate` function, or by prompting and specifying the option name to be `"git"`
+   * For prompting, you can make use of {@link commonQuestions.git}
+   */
   git: boolean;
+
+  /**
+   * The runtime that the project is running on.
+   * 
+   * This is usually assigned based on either the presence of a prompt by  specifying the option name to be `"runtime"`, via the `runtime` option in `defineTemplate`
+   * @todo Complete documentation
+   */
   runtime: TemplateRuntime;
   packageManager: TemplatePackageManager;
   use: <T extends BaseTool = BaseTool>(tool: T, options?: ToolOptions<T>) => void;
@@ -314,13 +335,28 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   copyFile: (from: string, dest: string) => void;
   copyDir: (from: string, dest: string) => void;
   commands: TemplateCommands;
+
+  /**
+   * Builtin tools from Grayprint
+   * 
+   * Builtin tools can be accessed via this object, as these tools are implemented in the CLI
+   * @todo Document each property
+   */
   tools: {
     tailwind: BaseTool;
     eslint: BaseTool;
     sass: BaseTool;
     prettier: BaseTool;
   };
+
+  /**
+   * A simple function to initialise Git in the user's root project directory.
+   * 
+   * This function can only work if {@link TemplateBuiltContext.git} is set to true
+   */
   initGit(): Promise<void>;
+
+  /** A synchronised version of the `initGit` function */
   initGitSync(): void;
 }
 
