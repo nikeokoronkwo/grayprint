@@ -1,3 +1,9 @@
+<div style="text-align: center;">
+
+![Grayprint Logo](https://github.com/user-attachments/assets/a1775b2a-a90d-4360-95c5-a1b383515c18)
+  
+</div>
+
 # Grayprint
 
 Grayprint is a command-line tool that makes it easier to setup your projects
