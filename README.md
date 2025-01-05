@@ -1,7 +1,10 @@
 <div style="text-align: center;">
-
-![Grayprint Logo](https://github.com/user-attachments/assets/a1775b2a-a90d-4360-95c5-a1b383515c18)
   
+![Grayprint Logo](https://github.com/user-attachments/assets/3dd33424-2198-4203-8afc-a12d52a8c5ad)
+  
+<!--- ![Grayprint Logo](https://github.com/user-attachments/assets/a1775b2a-a90d-4360-95c5-a1b383515c18) -->
+
+
 </div>
 
 # Grayprint
