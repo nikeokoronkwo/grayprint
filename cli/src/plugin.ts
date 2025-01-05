@@ -37,3 +37,7 @@ export function getBuiltinTemplate(identifier: string): BaseTemplate {
 export function getTemplate(url: URL): BaseTemplate {
   throw new Error("Unimplemented");
 }
+
+export function isBuiltinTemplate(identifier: string) {
+  throw new Error("Unimplemented");
+}

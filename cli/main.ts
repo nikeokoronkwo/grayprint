@@ -5,10 +5,12 @@ import {
   getTemplate,
   getTemplateType,
   getTemplateUrl,
-  TemplateType,
+  TemplateType
 } from "./src/plugin.ts";
 import { runTemplate } from "./src/run.ts";
 import { BaseTemplate } from "@grayprint/core";
+import { join } from "jsr:@std/path/join";
+import { isAbsolute } from "jsr:@std/path/is-absolute";
 
 type FlagType = "boolean" | "string" | "list";
 
@@ -71,12 +73,18 @@ if (args.help) {
   Deno.exit(0);
 }
 
+const cwd = args._.length === 0 ? Deno.cwd() : (isAbsolute(args._[0] as string)) ? args._[0] as string : join(Deno.cwd(), args._[0] as string);
+
+const templateType = args.template ? getTemplateType(args.template) : TemplateType.Core;
 // run basic template
 /** @todo Find a better way to do this */
 const template: BaseTemplate = args.template
-  ? getTemplateType(args.template) === TemplateType.Builtin
+  ? templateType === TemplateType.Builtin
     ? getBuiltinTemplate(args.template)
     : getTemplate(getTemplateUrl(args.template))
   : defineCoreTemplate();
 
-await runTemplate(template);
+await runTemplate(template, {
+  type: templateType,
+  cwd
+});

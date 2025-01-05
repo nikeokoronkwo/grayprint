@@ -8,6 +8,10 @@ Grayprint makes it possible to easily make and share project templates for
 people to use, with support for authentication, user-provided information, .env
 files, and more!
 
+> This project is still a work in progress, and some of the features have either not been implemented yet, or are experimental
+> 
+> Contributions are always welcome, and if you have any issue do consider filing a bug for it if not avaialble.
+
 ## Getting Started
 
 To begin using grayprint, you will need to install it.
@@ -21,16 +25,18 @@ in
 The grayprint CLI is available via `deno.land/x`
 
 ```bash
-deno install -A deno.land/x/grayprint/main.ts
+deno install -A deno.land/x/grayprint/main.ts -n grayprint
 ```
 
 ### Node/Bun
 
-The grayprint CLI has been built for Node and is available as an NPM package
+The grayprint CLI has been built for Node and is available as an NPM package that can be installed globally
 
 ```bash
 npm install -g grayprint # npm
 pnpm add -g grayprint # pnpm
+yarn global add grayprint # yarn
+bun add -g grayprint # bun
 ```
 
 ### Other
