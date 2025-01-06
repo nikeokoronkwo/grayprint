@@ -302,6 +302,8 @@ interface BuiltContext {
   addScript: (name: string, cmd: string) => void;
 }
 
+export type ToolOptions<T extends BaseTool> = {};
+
 // TODO: Document
 export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   extends TemplateContext<T>, BuiltContext {
