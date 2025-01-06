@@ -1,13 +1,13 @@
 import { build, emptyDir } from "jsr:@deno/dnt";
-import cliJson from "../cli/deno.json" with { type: 'json' }
+import cliJson from "../cli/deno.json" with { type: "json" };
 
 await emptyDir("./npm");
 
 await build({
   entryPoints: [{
-    kind: 'bin',
-    name: 'grayprint',
-    path: "cli/main.ts"
+    kind: "bin",
+    name: "grayprint",
+    path: "cli/main.ts",
   }],
   outDir: "./npm",
   scriptModule: false,
@@ -15,12 +15,13 @@ await build({
     // see JS docs for overview and more options
     deno: true,
   },
-  importMap: 'deno.json',
+  importMap: "deno.json",
   package: {
     // package.json properties
     name: "grayprint",
     version: cliJson.version,
-    description: "Grayprint is a command-line tool that makes it easier to setup your projects with ease.",
+    description:
+      "Grayprint is a command-line tool that makes it easier to setup your projects with ease.",
     // license: "MIT",
     repository: {
       type: "git",

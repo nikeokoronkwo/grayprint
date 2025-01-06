@@ -1,5 +1,16 @@
-
-export const frameworks = {
+export const frameworks: {
+  [k: string]: {
+    name: string;
+    meta: {
+      name: string;
+      scaffold: (options: any) => string[];
+    }[];
+    apps?: {
+      name: string;
+      scaffold: (options: any) => string[];
+    }[];
+  };
+} = {
   react: {
     name: "React",
     meta: [{
@@ -15,7 +26,7 @@ export const frameworks = {
           options.packageManager === "deno"
             ? "--skip-install"
             : `--use-${options.packageManager}`,
-        ].join(" ");
+        ];
       },
     }, {
       name: "Remix",
@@ -28,7 +39,7 @@ export const frameworks = {
           "--no-git-init",
           "--package-manager",
           options.packageManager,
-        ].join(" ");
+        ];
       },
     }],
     apps: [{
@@ -48,7 +59,7 @@ export const frameworks = {
     name: "Preact",
     meta: [{
       name: "Fresh",
-      runtime: 'deno',
+      runtime: "deno",
       // When scaffolding nextjs app, run deno install afterwards
       scaffold: (options) => {
         return [
@@ -60,16 +71,16 @@ export const frameworks = {
           options.packageManager === "deno"
             ? "--skip-install"
             : `--use-${options.packageManager}`,
-        ].join(" ");
-      }
-    }]
+        ];
+      },
+    }],
   },
   angular: {
-    name: 'Angular',
-    meta: []
+    name: "Angular",
+    meta: [],
   },
   vue: {
-    name: 'Vue',
+    name: "Vue",
     meta: [{
       name: "Nuxt",
       // When scaffolding nextjs app, run deno install afterwards
@@ -83,12 +94,12 @@ export const frameworks = {
           options.packageManager === "deno"
             ? "--skip-install"
             : `--use-${options.packageManager}`,
-        ].join(" ");
-      }
-    }]
+        ];
+      },
+    }],
   },
   solid: {
-    name: 'Solid',
+    name: "Solid",
     meta: [{
       name: "SolidStart",
       // When scaffolding nextjs app, run deno install afterwards
@@ -102,12 +113,12 @@ export const frameworks = {
           options.packageManager === "deno"
             ? "--skip-install"
             : `--use-${options.packageManager}`,
-        ].join(" ");
-      }
-    }]
+        ];
+      },
+    }],
   },
   qwik: {
-    name: 'Qwik',
+    name: "Qwik",
     meta: [{
       name: "QwikCity",
       // When scaffolding nextjs app, run deno install afterwards
@@ -121,9 +132,9 @@ export const frameworks = {
           options.packageManager === "deno"
             ? "--skip-install"
             : `--use-${options.packageManager}`,
-        ].join(" ");
-      }
-    }]
+        ];
+      },
+    }],
   },
   vanilla: {},
 } as const;

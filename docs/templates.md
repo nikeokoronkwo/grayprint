@@ -1,7 +1,7 @@
 # Templates
 
-Templates are what power grayprint. They are the blueprint that shows and
-tells how grayprint should
+Templates are what power grayprint. They are the blueprint that shows and tells
+how grayprint should
 
 Templates make it easy for you to scaffold a project, while also allowing you to
 easily configure a project.
@@ -33,9 +33,9 @@ grayprint -t https://deno.land/x/nike/mod.ts # Reads a template from the file se
 
 ## Creating your own Template
 
-Creating a grayprint template can be done with the `@grayprint/create`
-package. This package is platform-agnostic, (as most of the APIs are implemented
-in the CLI) and available on JSR to use.
+Creating a grayprint template can be done with the `@grayprint/create` package.
+This package is platform-agnostic, (as most of the APIs are implemented in the
+CLI) and available on JSR to use.
 
 To begin, install the package:
 

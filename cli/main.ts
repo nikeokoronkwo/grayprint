@@ -5,7 +5,7 @@ import {
   getTemplate,
   getTemplateType,
   getTemplateUrl,
-  TemplateType
+  TemplateType,
 } from "./src/plugin.ts";
 import { runTemplate } from "./src/run.ts";
 import { BaseTemplate } from "@grayprint/core";
@@ -73,9 +73,15 @@ if (args.help) {
   Deno.exit(0);
 }
 
-const cwd = args._.length === 0 ? Deno.cwd() : (isAbsolute(args._[0] as string)) ? args._[0] as string : join(Deno.cwd(), args._[0] as string);
+const cwd = args._.length === 0
+  ? Deno.cwd()
+  : (isAbsolute(args._[0] as string))
+  ? args._[0] as string
+  : join(Deno.cwd(), args._[0] as string);
 
-const templateType = args.template ? getTemplateType(args.template) : TemplateType.Core;
+const templateType = args.template
+  ? getTemplateType(args.template)
+  : TemplateType.Core;
 // run basic template
 /** @todo Find a better way to do this */
 const template: BaseTemplate = args.template
@@ -86,5 +92,5 @@ const template: BaseTemplate = args.template
 
 await runTemplate(template, {
   type: templateType,
-  cwd
+  cwd,
 });

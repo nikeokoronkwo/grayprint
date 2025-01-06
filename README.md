@@ -1,9 +1,8 @@
 <div style="text-align: center;">
-  
-![Grayprint Logo](https://github.com/user-attachments/assets/3dd33424-2198-4203-8afc-a12d52a8c5ad)
-  
-<!--- ![Grayprint Logo](https://github.com/user-attachments/assets/a1775b2a-a90d-4360-95c5-a1b383515c18) -->
 
+![Grayprint Logo](https://github.com/user-attachments/assets/3dd33424-2198-4203-8afc-a12d52a8c5ad)
+
+<!--- ![Grayprint Logo](https://github.com/user-attachments/assets/a1775b2a-a90d-4360-95c5-a1b383515c18) -->
 
 </div>
 
@@ -17,9 +16,11 @@ Grayprint makes it possible to easily make and share project templates for
 people to use, with support for authentication, user-provided information, .env
 files, and more!
 
-> This project is still a work in progress, and some of the features have either not been implemented yet, or are experimental
-> 
-> Contributions are always welcome, and if you have any issue do consider filing a bug for it if not avaialble.
+> This project is still a work in progress, and some of the features have either
+> not been implemented yet, or are experimental
+>
+> Contributions are always welcome, and if you have any issue do consider filing
+> a bug for it if not avaialble.
 
 ## Getting Started
 
@@ -39,7 +40,8 @@ deno install -A deno.land/x/grayprint/main.ts -n grayprint
 
 ### Node/Bun
 
-The grayprint CLI has been built for Node and is available as an NPM package that can be installed globally
+The grayprint CLI has been built for Node and is available as an NPM package
+that can be installed globally
 
 ```bash
 npm install -g grayprint # npm
@@ -56,9 +58,9 @@ Grayprint is also available as a binary that can be installed via
 ## Custom Template
 
 Making a custom template is simple. Your templates can be described with a
-`grayprint.yaml` file, or programmatically with a `grayprint.config.js`
-file. Grayprint supports getting and using templates from the user's system
-(via path), Github (Public and Private Repositories), NPM, JSR, and direct URLs.
+`grayprint.yaml` file, or programmatically with a `grayprint.config.js` file.
+Grayprint supports getting and using templates from the user's system (via
+path), Github (Public and Private Repositories), NPM, JSR, and direct URLs.
 
 For more information on making custom templates,
 [check out the documentation](./docs/templates.md).

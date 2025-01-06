@@ -1,4 +1,9 @@
-import { BaseTemplate, ListTemplateOptions, TemplateRuntime, TemplatePackageManager } from "@grayprint/core";
+import {
+  BaseTemplate,
+  ListTemplateOptions,
+  TemplatePackageManager,
+  TemplateRuntime,
+} from "@grayprint/core";
 // @deno-types="npm:@types/prompts"
 import prompt from "npm:prompts";
 import { optionToPrompt } from "./runner/questionnaire.ts";
@@ -48,11 +53,12 @@ export async function runTemplate(template: BaseTemplate, options?: {
     ? new Application({
       name: templName,
       templateType: options?.type ?? TemplateType.Core,
-      typescript: preContext.config["typescript"] as boolean | undefined ?? false,
+      typescript: preContext.config["typescript"] as boolean | undefined ??
+        false,
       runtime: preContext.config["runtime"] as TemplateRuntime,
       cwd: options?.cwd ?? Deno.cwd(),
       config,
-      git: preContext.config['git'] as boolean | undefined ?? true
+      git: preContext.config["git"] as boolean | undefined ?? true,
     })
     : Application.fromContext(preContext, {
       templateType: options?.type ?? TemplateType.Core,

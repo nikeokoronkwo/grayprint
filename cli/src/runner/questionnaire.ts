@@ -20,7 +20,11 @@ export function optionToPrompt(
       initial: option.default,
     };
   } else if (option.type === "list" || "options" in option) {
-    if (typeof option.options === 'function') throw new Error('Options as functions are not implemented yet. File an issue')
+    if (typeof option.options === "function") {
+      throw new Error(
+        "Options as functions are not implemented yet. File an issue",
+      );
+    }
     return option.multiple
       ? {
         type: "multiselect",
@@ -35,15 +39,17 @@ export function optionToPrompt(
         choices: option.options.map((m) => ({ title: m })),
       };
   } else {
-    return 'validate' in option ? {
-      type: "text",
-      name: option.name,
-      message: option.question,
-      validate: option.validate
-    } : {
-      type: "text",
-      name: option.name,
-      message: option.question,
-    };
+    return "validate" in option
+      ? {
+        type: "text",
+        name: option.name,
+        message: option.question,
+        validate: option.validate,
+      }
+      : {
+        type: "text",
+        name: option.name,
+        message: option.question,
+      };
   }
 }

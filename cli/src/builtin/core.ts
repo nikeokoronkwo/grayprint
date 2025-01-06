@@ -6,7 +6,7 @@ interface CoreTemplate extends BaseTemplate {
 }
 
 export function defineCoreTemplate(): CoreTemplate {
-  const frontendOptions = Object.values(frameworks).map(v => v.name);
+  const frontendOptions = Object.values(frameworks).map((v) => v.name);
   return {
     name: "core",
     runtimes: ["deno", "bun", "node"],
@@ -60,7 +60,10 @@ export function defineCoreTemplate(): CoreTemplate {
           backend = await app.question({
             name: "backend",
             question: "What backend framework do you want to use?",
-            options: ["express", app.config["platform"] as string ?? "isomorphic"],
+            options: [
+              "express",
+              app.config["platform"] as string ?? "isomorphic",
+            ],
           });
         } else if (app.config["frontend"] === "Angular") {
           // angular options
@@ -162,7 +165,6 @@ export function defineCoreTemplate(): CoreTemplate {
 
       // scaffold framework
       if (app.config["vite"] !== "No") {
-
         // scaffold vite application
         const templ = getViteTemplate(
           app.config["frontend"] as string,
@@ -172,19 +174,18 @@ export function defineCoreTemplate(): CoreTemplate {
         if (app.config["vite"] === "SPA") {
           await app.run(
             ...app.commands.create,
-            app.runtime === "deno" ? "npm:create-vite@latest" : "vite@latest", ...(app.packageManager === 'npm' ? ['--'] : []),
-            '-t', 
+            app.runtime === "deno" ? "npm:create-vite@latest" : "vite@latest",
+            ...(app.packageManager === "npm" ? ["--"] : []),
+            "-t",
             templ,
-            app.config['name'] as string,
+            app.config["name"] as string,
           );
         } else {
           app.error("Unsupported platform");
         }
-
       } else {
         // todo: scaffold metaframework
       }
-
 
       // scaffold application if any
       // expo app will need to be created and then diffed, and tsconfig.json would be merged
@@ -204,9 +205,7 @@ export function defineCoreTemplate(): CoreTemplate {
       // add tools
       if (app.config["prettier"]) app.use(app.tools.prettier);
       if (app.config["eslint"]) {
-        app.use(app.tools.eslint, {
-          prettier: app.config["prettier"],
-        }); 
+        app.use(app.tools.eslint);
       }
 
       // install git
