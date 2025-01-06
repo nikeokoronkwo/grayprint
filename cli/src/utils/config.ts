@@ -1,2 +1,2 @@
 /** @todo Better typing */
-export type TemplateConfig = Record<string, string | boolean | string[]>;
+export type TemplateBuiltConfig = Record<string, string | boolean | string[]>;

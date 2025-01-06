@@ -16,7 +16,7 @@ import {
   TemplateToolContext,
 } from "@grayprint/core";
 
-import { TemplateConfig } from "../utils/config.ts";
+import { TemplateBuiltConfig } from "../utils/config.ts";
 import { TemplateType } from "../plugin.ts";
 import * as pm from "../core/packageManagers.ts";
 import tailwind from "../tools/tailwind.ts";
@@ -32,31 +32,34 @@ import {
 
 type isPromise<T> = T extends Promise<any> ? true : false;
 
-
 function updateConfigFile(file: string, addedConfig: object) {
   throw new Error("Unimplemented");
+}
+
+export interface ApplicationOptions<
+  T extends TemplateBuiltConfig = TemplateBuiltConfig,
+> {
+  name: string;
+  typescript: boolean;
+  config: T;
+  templateType?: TemplateType;
+  runtime?: TemplateRuntime;
+  cwd?: string;
+  verbose?: boolean;
+  git?: boolean;
+  cfg?: Record<string, any>;
 }
 
 /**
  * The main application class
  */
-export class Application<T extends TemplateConfig = TemplateConfig>
+export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
   implements TemplateBuiltContext {
   private templateType: TemplateType;
   private verbose: boolean;
   private environment;
 
-  constructor(options: {
-    name: string;
-    typescript: boolean;
-    config: T;
-    templateType?: TemplateType;
-    runtime?: TemplateRuntime;
-    cwd?: string;
-    verbose?: boolean;
-    git?: boolean;
-    cfg?: Record<string, any>;
-  }) {
+  constructor(options: ApplicationOptions<T>) {
     this.name = options.name;
     this.typescript = options.typescript;
     this.config = options.config;
@@ -141,11 +144,11 @@ export class Application<T extends TemplateConfig = TemplateConfig>
     let jsonContents = JSON.parse(contents);
     for (const k in jsonContents) {
       switch (typeof jsonContents[k]) {
-        case 'object':
+        case "object":
           jsonContents[k] = { ...jsonContents[k], ...this.configFile[k] };
           break;
         default:
-          jsonContents[k] = this.configFile[k] ?? jsonContents[k]
+          jsonContents[k] = this.configFile[k] ?? jsonContents[k];
           break;
       }
     }
@@ -204,22 +207,14 @@ export class Application<T extends TemplateConfig = TemplateConfig>
     return this.runSync("git", "init");
   }
 
-  use<U extends BaseToolOptions = BaseToolOptions>(tool: BaseTool<U>, options?: U): (ReturnType<BaseTool<U>["init"]> extends Promise<any> ? true : false) extends true ? Promise<void> : void {
-    const res = tool.init({ ...this, ...{
-      options,
-      run: this.run,
-      runSync: this.runSync,
-      install: this.install,
-      installSync: this.installSync,
-      getInstallArgs: this.getInstallArgs,
-      addScript: this.addScript,
-      error: this.error,
-      writeFile: this.writeFile,
-      readFile: this.readFile,
-      readFileSync: this.readFileSync
-    } });
-    if (res instanceof Promise) {
-      return res.then(_ => this.updateContext({ ...this, ...{
+  use<U extends BaseToolOptions = BaseToolOptions>(
+    tool: BaseTool<U>,
+    options?: U,
+  ): (ReturnType<BaseTool<U>["init"]> extends Promise<any> ? true
+    : false) extends true ? Promise<void> : void {
+    const res = tool.init({
+      ...(this as TemplateBuiltContext),
+      ...{
         options,
         run: this.run,
         runSync: this.runSync,
@@ -227,8 +222,28 @@ export class Application<T extends TemplateConfig = TemplateConfig>
         installSync: this.installSync,
         getInstallArgs: this.getInstallArgs,
         addScript: this.addScript,
-        error: this.error
-      } })) as any;
+        error: this.error,
+        writeFile: this.writeFile,
+        readFile: this.readFile,
+        readFileSync: this.readFileSync,
+      },
+    });
+    if (res instanceof Promise) {
+      return res.then((_) =>
+        this.updateContext({
+          ...this,
+          ...{
+            options,
+            run: this.run,
+            runSync: this.runSync,
+            install: this.install,
+            installSync: this.installSync,
+            getInstallArgs: this.getInstallArgs,
+            addScript: this.addScript,
+            error: this.error,
+          },
+        })
+      ) as any;
     }
     return undefined as any;
   }
@@ -322,8 +337,12 @@ export class Application<T extends TemplateConfig = TemplateConfig>
    * - Run code with VFS
    * - Delete and cleanup afterwards
    */
-  copyFile(from: string, dest: string) {}
-  copyDir(from: string, dest: string) {}
+  copyFile(from: string, dest: string) {
+    throw new Error("Not implemented for this class");
+  }
+  copyDir(from: string, dest: string) {
+    throw new Error("Not implemented for this class");
+  }
 
   question(q: TemplateOptions): PromiseLike<string | boolean | string[]> {
     throw new Error(
@@ -348,13 +367,20 @@ export class Application<T extends TemplateConfig = TemplateConfig>
   }
 
   writeFile(file: string, contents: string) {
-    return Deno.writeTextFileSync(isAbsolute(file) ? file : join(this.cwd, file), contents)
+    return Deno.writeTextFileSync(
+      isAbsolute(file) ? file : join(this.cwd, file),
+      contents,
+    );
   }
   async readFile(file: string): Promise<string> {
-    return await Deno.readTextFile(isAbsolute(file) ? file : join(this.cwd, file));
+    return await Deno.readTextFile(
+      isAbsolute(file) ? file : join(this.cwd, file),
+    );
   }
   readFileSync(file: string): string {
-    return Deno.readTextFileSync(isAbsolute(file) ? file : join(this.cwd, file));
+    return Deno.readTextFileSync(
+      isAbsolute(file) ? file : join(this.cwd, file),
+    );
   }
 
   chDir(newDir: string): void {

@@ -1,4 +1,8 @@
-import { BaseTemplate, commonQuestions, TemplatePackageManager } from "@grayprint/core";
+import {
+  BaseTemplate,
+  commonQuestions,
+  TemplatePackageManager,
+} from "@grayprint/core";
 import { frameworks } from "../core/frameworks.ts";
 
 interface CoreTemplate extends BaseTemplate {
@@ -129,23 +133,23 @@ export function defineCoreTemplate(): CoreTemplate {
       }
 
       let pms: TemplatePackageManager[] = [];
-      switch (app.config['platform']) {
-        case 'deno':
-          pms = ['deno']
+      switch (app.config["platform"]) {
+        case "deno":
+          pms = ["deno"];
           break;
-        case 'node':
-          pms = ['npm', 'pnpm', 'yarn']
-        break;
-        case 'bun':
-          pms = ['bun']
-        break;
+        case "node":
+          pms = ["npm", "pnpm", "yarn"];
+          break;
+        case "bun":
+          pms = ["bun"];
+          break;
         default:
           break;
       }
 
       const packageManager = await app.question({
         ...commonQuestions.packageManager,
-        ...{ options: pms }
+        ...{ options: pms },
       });
 
       return {
@@ -160,7 +164,7 @@ export function defineCoreTemplate(): CoreTemplate {
     create: async (app) => {
       console.log(`Building ${app.config["name"]}`);
       // check necessary options
-      const frontend = app.config['frontend'] as string;
+      const frontend = app.config["frontend"] as string;
 
       // scaffold application
 
@@ -185,7 +189,7 @@ export function defineCoreTemplate(): CoreTemplate {
           app.error("Unsupported platform");
         }
 
-        app.chDir(app.config['name'] as string);
+        app.chDir(app.config["name"] as string);
       } else {
         // todo: scaffold metaframework
       }
@@ -195,13 +199,19 @@ export function defineCoreTemplate(): CoreTemplate {
 
       // add styling libraries
 
-      for (const s of app.config['styles'] as string[]) {
+      for (const s of app.config["styles"] as string[]) {
         switch (s) {
           case "tailwind":
-            if (!(app.config['meta'] && ['fresh'].includes(app.config['meta'].toString().toLowerCase()))) {
+            if (
+              !(app.config["meta"] &&
+                ["fresh"].includes(app.config["meta"].toString().toLowerCase()))
+            ) {
               app.use(app.tools.tailwind, {
-                frontend: (app.config['meta'] ? app.config['meta'] : (frontend ? frontend : undefined))?.toString().toLowerCase(),
-                typescript: app.typescript
+                frontend: (app.config["meta"]
+                  ? app.config["meta"]
+                  : (frontend ? frontend : undefined))?.toString()
+                  .toLowerCase(),
+                typescript: app.typescript,
               });
             }
             break;
@@ -214,23 +224,23 @@ export function defineCoreTemplate(): CoreTemplate {
       }
 
       // add tools
-      if (app.config["prettier"]) app.use(app.tools.prettier, {
-        eslint: app.config['eslint']
-      });
+      if (app.config["prettier"]) {
+        app.use(app.tools.prettier, {
+          eslint: app.config["eslint"],
+        });
+      }
 
       if (app.config["eslint"]) {
         app.use(app.tools.eslint, {
           typescript: app.typescript,
-          react: app.config['frontend'] === 'React',
-          vue: app.config['frontend'] === 'Vue',
+          react: app.config["frontend"] === "React",
+          vue: app.config["frontend"] === "Vue",
           browser: true,
         });
       }
 
-
       // install git
       if (app.git) app.initGitSync();
-
     },
   };
 }

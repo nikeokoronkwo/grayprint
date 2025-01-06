@@ -11,8 +11,11 @@ export default defineCoreTool<PrettierOptions>({
       context.addScript("fmt", "prettier . --write");
     }
 
-    context.writeFile('.prettierrc', '{}');
-    context.writeFile('.prettierignore', '# Ignore artifacts:\nbuild\ncoverage\n');
+    context.writeFile(".prettierrc", "{}");
+    context.writeFile(
+      ".prettierignore",
+      "# Ignore artifacts:\nbuild\ncoverage\n",
+    );
 
     if (context.options?.eslint) {
       context.install("eslint-prettier-config");

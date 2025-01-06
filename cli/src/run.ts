@@ -87,11 +87,11 @@ export async function runTemplate(template: BaseTemplate, options?: {
   // this includes: building and running any tools used
   const app = await template.create(context);
 
-  console.info('Adding updated config info...');
+  console.info("Adding updated config info...");
   await context.dumpConfig();
 
   if (template.autoInstallDeps) {
-    console.log(blue('Installing dependencies...'))
+    console.log(blue("Installing dependencies..."));
     await context.installDependencies();
   }
 }

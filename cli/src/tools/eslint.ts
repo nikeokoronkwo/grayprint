@@ -6,7 +6,7 @@ export default defineCoreTool<ESLintOptions>({
   name: "eslint",
   init(context) {
     try {
-      const c = context.readFileSync('eslint.config.js');
+      const c = context.readFileSync("eslint.config.js");
       return;
     } catch (error) {
       // eslint not exists

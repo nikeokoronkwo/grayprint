@@ -23,5 +23,7 @@ export interface BaseToolOptions {
  */
 export interface BaseTool<T extends BaseToolOptions = BaseToolOptions> {
   name: string;
-  init: <U extends T = T>(context: TemplateToolContext<U>) => Promise<void> | void;
+  init: <U extends T = T>(
+    context: TemplateToolContext<U>,
+  ) => Promise<void> | void;
 }

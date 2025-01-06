@@ -110,7 +110,7 @@ const frameworkMappings: Record<TailwindFramework, {
   },
 
   fresh: {
-    extensions: _ => ["ts", "tsx"],
+    extensions: (_) => ["ts", "tsx"],
     cssFile: "./static/styles.css",
     htmlFile: undefined,
     sourceDir: ["routes", "islands", "components"],
