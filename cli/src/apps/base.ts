@@ -39,6 +39,10 @@ function runTool<T extends BaseToolOptions = BaseToolOptions>(
   throw new Error("Unimplemented");
 }
 
+function updateConfigFile(file: string, addedConfig: object) {
+  throw new Error("Unimplemented");
+}
+
 /**
  * The main application class
  */
@@ -240,7 +244,14 @@ export class Application<T extends TemplateConfig = TemplateConfig>
     } /* : { args: args.length === 1 ? [] : args.slice(1), cwd: this.cwd, stdin: 'piped', stdout: 'piped', stderr: 'piped' } */);
     const { success, stderr, stdout } = command.outputSync();
 
-    if (!success) this.error(new TextDecoder().decode(stderr));
+    if (!success) {
+      this.error(new TextDecoder().decode(stderr));
+      throw new Error(`Error when running ${args.join(", ")}`);
+    }
+  }
+
+  transformConfig(file: string, addedConfig: object) {
+    return updateConfigFile(file, addedConfig);
   }
 
   addScript(name: string, cmd: string) {
@@ -312,7 +323,7 @@ export class Application<T extends TemplateConfig = TemplateConfig>
     if (contents) f.writeSync(new TextEncoder().encode(contents));
   }
 
-  writeFile(file: string, contents: string) {
-    Deno.writeTextFileSync(file, contents);
-  }
+  writeFile: (file: string, contents: string) => void = Deno.writeTextFileSync;
+  readFile: (file: string) => Promise<string> = Deno.readTextFile;
+  readFileSync: (file: string) => string = Deno.readTextFileSync;
 }

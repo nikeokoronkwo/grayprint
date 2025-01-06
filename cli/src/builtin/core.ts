@@ -14,7 +14,6 @@ export function defineCoreTemplate(): CoreTemplate {
     options: [
       commonQuestions.name,
       commonQuestions.platform,
-      commonQuestions.packageManager,
       {
         name: "frontend",
         question: "What frontend framework do you want to use?",
@@ -68,36 +67,16 @@ export function defineCoreTemplate(): CoreTemplate {
         } else if (app.config["frontend"] === "Angular") {
           // angular options
         } else {
-          let metaOptions: string[] = [];
-          switch (app.config["frontend"]) {
-            case "React":
-              metaOptions = ["NextJS", "Remix", "Gatsby"];
-              break;
-            case "Svelte":
-              meta = "SvelteKit";
-              app.log(`Metaframework defaulting to ${meta}...`);
-              break;
-            case "Vue":
-              meta = "Nuxt";
-              app.log(`Metaframework defaulting to ${meta}...`);
-              break;
-            case "Solid":
-              meta = "Nuxt";
-              app.log(`Metaframework defaulting to ${meta}...`);
-              break;
-            case "Qwik":
-              meta = "QwikCity";
-              app.log(`Metaframework defaulting to ${meta}...`);
-              break;
-            case "Preact":
-              if (app.config["platform"] === "deno") {
-                meta = "Fresh";
-                app.log(`Metaframework defaulting to ${meta}...`);
-              }
-              break;
-          }
+          const m = Object.entries(frameworks).find(([name, fw]) =>
+            name === app.config["frontend"]?.toString().toLowerCase() ||
+            fw.name === app.config["frontend"]
+          )?.[1].meta;
+          const metaOptions = m?.map((opt) => opt.name) ?? [];
 
-          if (!meta || metaOptions.length !== 0) {
+          if (metaOptions.length !== 0) {
+            app.log(`Defaulting to ${metaOptions[0]}`);
+            meta = metaOptions[0];
+          } else if (!meta || metaOptions.length !== 0) {
             meta = await app.question({
               name: "metaframework",
               question: "What metaframework do you want to use?",
@@ -149,10 +128,13 @@ export function defineCoreTemplate(): CoreTemplate {
         });
       }
 
+      const packageManager = app.question(commonQuestions.packageManager);
+
       return {
         mobile_framework,
         meta,
         backend,
+        packageManager,
       };
     },
     /** @todo Make tools like eslint 'tools' rather than 'options' */
@@ -160,6 +142,7 @@ export function defineCoreTemplate(): CoreTemplate {
     create: async (app) => {
       console.log(`Building ${app.config["name"]}`);
       // check necessary options
+      const frontend = app.config['frontend'] as string;
 
       // scaffold application
 
@@ -193,7 +176,7 @@ export function defineCoreTemplate(): CoreTemplate {
       // add styling libraries
       switch (app.config["styles"]) {
         case "Tailwind":
-          app.use(app.tools.tailwind);
+          if (!(app.config['meta'] && ['fresh'].includes(app.config['meta'].toString().toLowerCase()))) app.use(app.tools.tailwind);
           break;
         case "Sass":
           app.use(app.tools.sass);

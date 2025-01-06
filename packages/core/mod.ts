@@ -6,10 +6,12 @@ import {
   TemplateOptions,
 } from "./base.ts";
 import { ESLintTool, PrettierTool, SassTool, TailwindTool } from "./builtin.ts";
-import { BaseTool, BaseToolOptions, TemplateRuntime } from "./tools.ts";
-
-/** Template Package Managers that can be used with grayprint */
-export type TemplatePackageManager = "deno" | "bun" | "npm" | "pnpm" | "yarn";
+import {
+  BaseTool,
+  BaseToolOptions,
+  TemplatePackageManager,
+  TemplateRuntime,
+} from "./tools.ts";
 
 /**
  * An object used to encapsulate important arguments for commands for a given package manager

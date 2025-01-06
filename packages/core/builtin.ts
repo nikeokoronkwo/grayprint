@@ -14,6 +14,12 @@ export interface ESLintOptions extends BaseToolOptions {
 }
 
 export interface TailwindOptions extends BaseToolOptions {
+  framework?: string;
+  typescript?: boolean;
+  noFramework?: {
+    cssFile?: string;
+    srcDir?: string;
+  };
 }
 
 export type TailwindTool = BaseTool<TailwindOptions>;

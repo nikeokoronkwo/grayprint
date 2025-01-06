@@ -1,22 +1,18 @@
-export const frameworks: {
-  [k: string]: {
-    name: string;
-    meta: {
-      name: string;
-      scaffold: (options: any) => string[];
-    }[];
-    apps?: {
-      name: string;
-      scaffold: (options: any) => string[];
-    }[];
-  };
-} = {
+import { TemplateRuntime } from "@grayprint/core";
+
+interface NewType {
+  [x: string]: any;
+  packageInstaller: any;
+  packageManager: string;
+}
+
+export const frameworks = {
   react: {
     name: "React",
     meta: [{
       name: "NextJS",
       // When scaffolding nextjs app, run deno install afterwards
-      scaffold: (options) => {
+      scaffold: (options: NewType) => {
         return [
           ...options.packageInstaller,
           "create-next",
@@ -30,7 +26,7 @@ export const frameworks: {
       },
     }, {
       name: "Remix",
-      scaffold: (options) => {
+      scaffold: (options: NewType) => {
         return [
           ...options.commands.create,
           "remix",
@@ -45,13 +41,14 @@ export const frameworks: {
     apps: [{
       name: "React Native",
       scaffoldOnOwn: true,
-      scaffold: (options) => {
-        // todo
+      scaffold: (options: NewType) => {
+        throw new Error("Unimplemented");
       },
     }, {
       name: "Ionic",
       scaffoldOnOwn: true,
-      scaffold: (options) => {
+      scaffold: (options: NewType) => {
+        throw new Error("Unimplemented");
       },
     }],
   },
@@ -61,7 +58,7 @@ export const frameworks: {
       name: "Fresh",
       runtime: "deno",
       // When scaffolding nextjs app, run deno install afterwards
-      scaffold: (options) => {
+      scaffold: (options: NewType) => {
         return [
           ...options.packageInstaller,
           "create-next",
@@ -84,7 +81,7 @@ export const frameworks: {
     meta: [{
       name: "Nuxt",
       // When scaffolding nextjs app, run deno install afterwards
-      scaffold: (options) => {
+      scaffold: (options: NewType) => {
         return [
           ...options.packageInstaller,
           "create-next",
@@ -103,7 +100,25 @@ export const frameworks: {
     meta: [{
       name: "SolidStart",
       // When scaffolding nextjs app, run deno install afterwards
-      scaffold: (options) => {
+      scaffold: (options: NewType) => {
+        return [
+          ...options.packageInstaller,
+          "create-next",
+          options["tailwind"] ? "--tailwind" : "--no-tailwind",
+          options["eslint"] ? "--eslint" : "--no-eslint",
+          options["typescript"] ? "--typescript" : "--javascript",
+          options.packageManager === "deno"
+            ? "--skip-install"
+            : `--use-${options.packageManager}`,
+        ];
+      },
+    }],
+  },
+  svelte: {
+    name: "Svelte",
+    meta: [{
+      name: "SvelteKit",
+      scaffold: (options: NewType) => {
         return [
           ...options.packageInstaller,
           "create-next",
@@ -122,7 +137,7 @@ export const frameworks: {
     meta: [{
       name: "QwikCity",
       // When scaffolding nextjs app, run deno install afterwards
-      scaffold: (options) => {
+      scaffold: (options: NewType) => {
         return [
           ...options.packageInstaller,
           "create-next",
@@ -136,7 +151,9 @@ export const frameworks: {
       },
     }],
   },
-  vanilla: {},
 } as const;
 
 export type FrameworkType = keyof typeof frameworks;
+export type MetaFrameworkType = Lowercase<
+  typeof frameworks[keyof typeof frameworks]["meta"][number]["name"]
+>;

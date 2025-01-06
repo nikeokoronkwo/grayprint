@@ -275,5 +275,29 @@ export interface BuiltContext {
   createDir: (dir: string) => void;
   createFile: (file: string, contents?: string) => void;
   writeFile: (file: string, contents: string) => void;
+  readFile: (file: string) => Promise<string>;
+  readFileSync: (file: string) => string;
   addScript: (name: string, cmd: string) => void;
+
+  /**
+   * This function is used for manipulaing configuration files by programmatically manipualing the AST of the configuration files.
+   *
+   * This makes adding options to configuration files much easier rather than having to deal with making use of regular expressions.
+   *
+   * ```ts
+   * // add runtimeConfig property to Nuxt Config
+   * context.transformConfig('nuxt.config.js', {
+   *   runtimeConfig: {
+   *     apiKey: '*****'
+   *   }
+   * });
+   * ```
+   *
+   * **NOTE**: This API is **unstable** and might be removed in the future, depending on usage.
+   *
+   * @param {string} file The name of the file to apply the given configuration updates to
+   * @param {object} addedConfig The configuration object to add, or override, as a JS literal object
+   * @returns {void}
+   */
+  transformConfig: (file: string, addedConfig: object) => void;
 }
