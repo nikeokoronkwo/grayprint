@@ -1,20 +1,12 @@
 import { BaseTemplate, commonQuestions } from "@grayprint/core";
+import { frameworks } from "../core/frameworks.ts";
 
 interface CoreTemplate extends BaseTemplate {
   name: "core";
 }
 
 export function defineCoreTemplate(): CoreTemplate {
-  const frontendOptions = [
-    "React",
-    "Preact",
-    "Svelte",
-    "Vue",
-    "Solid",
-    "Qwik",
-    "Vanilla",
-    "Angular",
-  ];
+  const frontendOptions = Object.values(frameworks).map(v => v.name);
   return {
     name: "core",
     runtimes: ["deno", "bun", "node"],
