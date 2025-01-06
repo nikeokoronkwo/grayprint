@@ -1,4 +1,4 @@
-import { BaseTemplate, commonQuestions } from "@grayprint/core";
+import { BaseTemplate, commonQuestions, TemplatePackageManager } from "@grayprint/core";
 import { frameworks } from "../core/frameworks.ts";
 
 interface CoreTemplate extends BaseTemplate {
@@ -128,7 +128,25 @@ export function defineCoreTemplate(): CoreTemplate {
         });
       }
 
-      const packageManager = app.question(commonQuestions.packageManager);
+      let pms: TemplatePackageManager[] = [];
+      switch (app.config['platform']) {
+        case 'deno':
+          pms = ['deno']
+          break;
+        case 'node':
+          pms = ['npm', 'pnpm', 'yarn']
+        break;
+        case 'bun':
+          pms = ['bun']
+        break;
+        default:
+          break;
+      }
+
+      const packageManager = await app.question({
+        ...commonQuestions.packageManager,
+        ...{ options: pms }
+      });
 
       return {
         mobile_framework,
@@ -166,6 +184,8 @@ export function defineCoreTemplate(): CoreTemplate {
         } else {
           app.error("Unsupported platform");
         }
+
+        app.chDir(app.config['name'] as string);
       } else {
         // todo: scaffold metaframework
       }
@@ -174,25 +194,43 @@ export function defineCoreTemplate(): CoreTemplate {
       // expo app will need to be created and then diffed, and tsconfig.json would be merged
 
       // add styling libraries
-      switch (app.config["styles"]) {
-        case "Tailwind":
-          if (!(app.config['meta'] && ['fresh'].includes(app.config['meta'].toString().toLowerCase()))) app.use(app.tools.tailwind);
-          break;
-        case "Sass":
-          app.use(app.tools.sass);
-          break;
-        default:
-          break;
+
+      for (const s of app.config['styles'] as string[]) {
+        switch (s) {
+          case "tailwind":
+            if (!(app.config['meta'] && ['fresh'].includes(app.config['meta'].toString().toLowerCase()))) {
+              app.use(app.tools.tailwind, {
+                frontend: (app.config['meta'] ? app.config['meta'] : (frontend ? frontend : undefined))?.toString().toLowerCase(),
+                typescript: app.typescript
+              });
+            }
+            break;
+          case "sass":
+            app.use(app.tools.sass);
+            break;
+          default:
+            break;
+        }
       }
 
       // add tools
-      if (app.config["prettier"]) app.use(app.tools.prettier);
+      if (app.config["prettier"]) app.use(app.tools.prettier, {
+        eslint: app.config['eslint']
+      });
+
       if (app.config["eslint"]) {
-        app.use(app.tools.eslint);
+        app.use(app.tools.eslint, {
+          typescript: app.typescript,
+          react: app.config['frontend'] === 'React',
+          vue: app.config['frontend'] === 'Vue',
+          browser: true,
+        });
       }
 
+
       // install git
-      if (app.git) app.initGit();
+      if (app.git) app.initGitSync();
+
     },
   };
 }

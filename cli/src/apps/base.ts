@@ -30,14 +30,8 @@ import {
   TailwindTool,
 } from "../../../packages/core/builtin.ts";
 
-/** @todo Implement use tool */
-function runTool<T extends BaseToolOptions = BaseToolOptions>(
-  tool: BaseTool<T>,
-  options?: T,
-  context?: TemplateContext,
-): TemplateToolContext<T> {
-  throw new Error("Unimplemented");
-}
+type isPromise<T> = T extends Promise<any> ? true : false;
+
 
 function updateConfigFile(file: string, addedConfig: object) {
   throw new Error("Unimplemented");
@@ -99,6 +93,7 @@ export class Application<T extends TemplateConfig = TemplateConfig>
     context: TemplateContext,
     options?: {
       templateType?: TemplateType;
+      cwd?: string;
     },
   ): Application {
     return new Application({
@@ -112,7 +107,7 @@ export class Application<T extends TemplateConfig = TemplateConfig>
       //@ts-ignore Object contains indexes
       git: context.config["git"],
       config: context.config,
-      cwd: context.cwd,
+      cwd: options?.cwd ?? context.cwd,
       templateType: options?.templateType,
       cfg: context.configFile,
     });
@@ -144,7 +139,16 @@ export class Application<T extends TemplateConfig = TemplateConfig>
       join(this.cwd, this.configFileName),
     );
     let jsonContents = JSON.parse(contents);
-    jsonContents = { ...jsonContents, ...this.configFile };
+    for (const k in jsonContents) {
+      switch (typeof jsonContents[k]) {
+        case 'object':
+          jsonContents[k] = { ...jsonContents[k], ...this.configFile[k] };
+          break;
+        default:
+          jsonContents[k] = this.configFile[k] ?? jsonContents[k]
+          break;
+      }
+    }
     await Deno.writeTextFile(
       join(this.cwd, this.configFileName),
       JSON.stringify(jsonContents),
@@ -158,7 +162,7 @@ export class Application<T extends TemplateConfig = TemplateConfig>
   private updateContext<T extends BaseToolOptions = BaseToolOptions>(
     res: TemplateToolContext<T>,
   ) {
-    throw new Error("Unimplemented");
+    // throw new Error("Unimplemented");
   }
 
   private getInstallArgs(tool: string, options?: {
@@ -200,13 +204,33 @@ export class Application<T extends TemplateConfig = TemplateConfig>
     return this.runSync("git", "init");
   }
 
-  /** @todo use tool */
-  use<T extends BaseToolOptions = BaseToolOptions>(
-    tool: BaseTool<T>,
-    options?: T,
-  ) {
-    const res = runTool<T>(tool);
-    this.updateContext<T>(res);
+  use<U extends BaseToolOptions = BaseToolOptions>(tool: BaseTool<U>, options?: U): (ReturnType<BaseTool<U>["init"]> extends Promise<any> ? true : false) extends true ? Promise<void> : void {
+    const res = tool.init({ ...this, ...{
+      options,
+      run: this.run,
+      runSync: this.runSync,
+      install: this.install,
+      installSync: this.installSync,
+      getInstallArgs: this.getInstallArgs,
+      addScript: this.addScript,
+      error: this.error,
+      writeFile: this.writeFile,
+      readFile: this.readFile,
+      readFileSync: this.readFileSync
+    } });
+    if (res instanceof Promise) {
+      return res.then(_ => this.updateContext({ ...this, ...{
+        options,
+        run: this.run,
+        runSync: this.runSync,
+        install: this.install,
+        installSync: this.installSync,
+        getInstallArgs: this.getInstallArgs,
+        addScript: this.addScript,
+        error: this.error
+      } })) as any;
+    }
+    return undefined as any;
   }
 
   async install(tool: string, options?: {
@@ -315,15 +339,25 @@ export class Application<T extends TemplateConfig = TemplateConfig>
   }
 
   createDir(dir: string, recursive?: boolean) {
-    Deno.mkdirSync(join(this.cwd, dir), { recursive });
+    Deno.mkdirSync(isAbsolute(dir) ? dir : join(this.cwd, dir), { recursive });
   }
 
   createFile(file: string, contents?: string) {
-    const f = Deno.createSync(file);
+    const f = Deno.createSync(isAbsolute(file) ? file : join(this.cwd, file));
     if (contents) f.writeSync(new TextEncoder().encode(contents));
   }
 
-  writeFile: (file: string, contents: string) => void = Deno.writeTextFileSync;
-  readFile: (file: string) => Promise<string> = Deno.readTextFile;
-  readFileSync: (file: string) => string = Deno.readTextFileSync;
+  writeFile(file: string, contents: string) {
+    return Deno.writeTextFileSync(isAbsolute(file) ? file : join(this.cwd, file), contents)
+  }
+  async readFile(file: string): Promise<string> {
+    return await Deno.readTextFile(isAbsolute(file) ? file : join(this.cwd, file));
+  }
+  readFileSync(file: string): string {
+    return Deno.readTextFileSync(isAbsolute(file) ? file : join(this.cwd, file));
+  }
+
+  chDir(newDir: string): void {
+    this.cwd = isAbsolute(newDir) ? newDir : join(this.cwd, newDir);
+  }
 }

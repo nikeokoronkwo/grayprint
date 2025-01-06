@@ -94,3 +94,5 @@ await runTemplate(template, {
   type: templateType,
   cwd,
 });
+
+Deno.exit(0);

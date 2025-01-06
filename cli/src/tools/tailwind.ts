@@ -132,7 +132,7 @@ export default defineCoreTool<TailwindOptions>({
   init(context) {
     let mapping: typeof frameworkMappings[keyof typeof frameworkMappings];
     let noFramework = false;
-    const framework = context.options.framework;
+    const framework = context.options?.framework;
 
     if (framework && isAFrameworkKeyMapping(framework)) {
       mapping = frameworkMappings[framework];
@@ -140,8 +140,8 @@ export default defineCoreTool<TailwindOptions>({
       noFramework = true;
       mapping = {
         extensions: (t) => t ? ["html", "js", "ts"] : ["html", "js"],
-        cssFile: context.options.noFramework?.cssFile ?? "./main.css",
-        sourceDir: [context.options.noFramework?.srcDir ?? "./src"],
+        cssFile: context.options?.noFramework?.cssFile ?? "./main.css",
+        sourceDir: [context.options?.noFramework?.srcDir ?? "./src"],
       };
     }
     context.installSync("tailwindcss", { dev: true });
@@ -168,7 +168,7 @@ export default defineCoreTool<TailwindOptions>({
 
     context.writeFile(
       "tailwind.config.js",
-      composeTailwindFile(mapping, context.options.typescript ?? true),
+      composeTailwindFile(mapping, context.options?.typescript ?? true),
     );
 
     context.writeFile(
@@ -189,14 +189,14 @@ export default defineCoreTool<TailwindOptions>({
     }
 
     if (
-      context.options.framework === "Nuxt" ||
-      context.options.framework === "nuxt"
+      context.options?.framework === "Nuxt" ||
+      context.options?.framework === "nuxt"
     ) {
       // update nuxt.config.ts
       context.log(
         yellow(
           `${bold("WARN")}: Unable to update "nuxt.config.${
-            context.options.typescript ? "ts" : "js"
+            context.options?.typescript ? "ts" : "js"
           }".\n`,
         ) +
           `To enable TailwindCSS to work correctly with Nuxt, update your ${
@@ -213,8 +213,8 @@ css: ["~/assets/css/main.css"]`),
     }
 
     if (
-      context.options.framework === "SvelteKit" ||
-      context.options.framework === "sveltekit"
+      context.options?.framework === "SvelteKit" ||
+      context.options?.framework === "sveltekit"
     ) {
       // update svelte.config.js
       context.log(
@@ -233,14 +233,14 @@ css: ["~/assets/css/main.css"]`),
     }
 
     if (
-      context.options.framework === "Remix" ||
-      context.options.framework === "remix"
+      context.options?.framework === "Remix" ||
+      context.options?.framework === "remix"
     ) {
       // update remix file
       context.log(
         yellow(
           `${bold("WARN")}: Unable to update "./app/root.${
-            context.options.typescript ? "tsx" : "jsx"
+            context.options?.typescript ? "tsx" : "jsx"
           }".\n`,
         ) +
           `To enable TailwindCSS to work completely with Remix, add the following import\n\n` +
@@ -263,8 +263,7 @@ module.exports = {
     ).concat(options.otherContentItems ?? []).concat(
       options.htmlFile ? [`"${options.htmlFile}"`] : [],
     ).join(",")
-  }]
-  // content: ["./src/**/*.{html,js}"],
+  }],
   theme: {
     extend: {},
   },

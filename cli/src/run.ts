@@ -11,6 +11,8 @@ import { getValue } from "./utils/getValue.ts";
 import { buildContext } from "./runner/context.ts";
 import { Application } from "./apps/base.ts";
 import { TemplateType } from "./plugin.ts";
+import { join } from "jsr:@std/path/join";
+import { blue } from "jsr:@std/fmt/colors";
 
 /** Runs a template */
 export async function runTemplate(template: BaseTemplate, options?: {
@@ -85,5 +87,11 @@ export async function runTemplate(template: BaseTemplate, options?: {
   // this includes: building and running any tools used
   const app = await template.create(context);
 
-  if (template.autoInstallDeps) await context.installDependencies();
+  console.info('Adding updated config info...');
+  await context.dumpConfig();
+
+  if (template.autoInstallDeps) {
+    console.log(blue('Installing dependencies...'))
+    await context.installDependencies();
+  }
 }

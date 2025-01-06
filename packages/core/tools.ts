@@ -9,7 +9,7 @@ export type TemplatePackageManager = "deno" | "bun" | "npm" | "pnpm" | "yarn";
 export interface TemplateToolContext<
   T extends BaseToolOptions = BaseToolOptions,
 > extends Omit<TemplateContext, "config">, BuiltContext {
-  options: T;
+  options?: T;
   runtime: TemplateRuntime;
   packageManager: TemplatePackageManager;
 }
@@ -23,5 +23,5 @@ export interface BaseToolOptions {
  */
 export interface BaseTool<T extends BaseToolOptions = BaseToolOptions> {
   name: string;
-  init?: <U extends T = T>(context: TemplateToolContext<U>) => void;
+  init: <U extends T = T>(context: TemplateToolContext<U>) => Promise<void> | void;
 }

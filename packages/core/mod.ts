@@ -31,6 +31,9 @@ export interface TemplateCommands {
   };
 }
 
+type isInitAsync<T extends (...args: any) => any> = ReturnType<T> extends Promise<any> ? true : false;
+type IsFunction<T> = T extends (...args: any[]) => any ? true : false;
+
 // TODO: Document
 export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   extends TemplateContext<T>, BuiltContext {
@@ -62,7 +65,7 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   use: <U extends BaseToolOptions = BaseToolOptions>(
     tool: BaseTool<U>,
     options?: U,
-  ) => void;
+  ) => isInitAsync<(typeof tool)['init']> extends true ? Promise<void> : void;
   path: TemplatePaths;
   copyFile: (from: string, dest: string) => void;
   copyDir: (from: string, dest: string) => void;

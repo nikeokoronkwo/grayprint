@@ -169,7 +169,7 @@ export const commonQuestions: {
     name: "platform",
     question: "What platform are you designing for?",
     type: "list",
-    options: ["deno", "node", "bun"],
+    options: ["node", "deno", "bun"],
   },
   /** This template option prompts the user for whether they want to use typescript */
   typescript: {
@@ -278,6 +278,9 @@ export interface BuiltContext {
   readFile: (file: string) => Promise<string>;
   readFileSync: (file: string) => string;
   addScript: (name: string, cmd: string) => void;
+
+  /** Changes the working directory for future commands */
+  chDir(newDir: string): void;
 
   /**
    * This function is used for manipulaing configuration files by programmatically manipualing the AST of the configuration files.
