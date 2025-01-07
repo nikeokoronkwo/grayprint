@@ -91,47 +91,62 @@ export class GithubApplication<
     dir?: string,
     file?: boolean,
   ) {
-    const finalDir = this.repoDir
-      ? (dir ? join(this.repoDir, dir) : this.repoDir)
-      : (dir ? dir : undefined);
-
-    const data = await fetch(
-      `https://api.github.com/repos/${this.repoUser}/${this.repoName}/contents${
-        finalDir ? `/${finalDir}` : ""
-      }`,
-    ).then(async (r) => await r.json());
-
-    if (file === true) {
-      return new TextDecoder(data.encoding ?? "base64").decode(
-        data.contents,
-      );
-    }
-
-    return {
-      name: this.repoDir ?? ".",
-      files: data.map((d) => {
-        if (d.type === "file") return new GFile(d);
-        else if (d.type === "dir") return new GDir(d, d.name);
-        else throw new Error("Unsupported file");
-      }),
-      async dump(dir: string) {
-        Deno.mkdirSync(dir);
-        for (const f of this.files) {
-          if (f instanceof GFile) await f.load();
-          else if (f instanceof GDir) await f.load();
-
-          f.dump(join(dir ?? ".", this.name));
-        }
-      },
-    };
+    return await loadGithubDir(
+      this.repoUser,
+      this.repoName,
+      this.repoDir,
+      file,
+      dir,
+    );
   }
 
   override copyFile(from: string, dest: string): void {
-    
   }
 
   override copyDir(from: string, dest: string): void {
     if (isAbsolute(from)) throw new Error("Cannot make use of absolute paths");
     const dir = this.load(from);
   }
+}
+
+export async function loadGithubDir(
+  repoUser: string,
+  repoName: string,
+  repoDir?: string,
+  file?: boolean,
+  dir?: string,
+) {
+  const finalDir = repoDir
+    ? (dir ? join(repoDir, dir) : repoDir)
+    : (dir ? dir : undefined);
+
+  const data = await fetch(
+    `https://api.github.com/repos/${repoUser}/${repoName}/contents${
+      finalDir ? `/${finalDir}` : ""
+    }`,
+  ).then(async (r) => await r.json());
+
+  if (file === true) {
+    return new TextDecoder(data.encoding ?? "base64").decode(
+      data.contents,
+    );
+  }
+
+  return {
+    name: repoDir ?? ".",
+    files: data.map((d) => {
+      if (d.type === "file") return new GFile(d);
+      else if (d.type === "dir") return new GDir(d, d.name);
+      else throw new Error("Unsupported file");
+    }),
+    async dump(dir: string) {
+      Deno.mkdirSync(dir);
+      for (const f of this.files) {
+        if (f instanceof GFile) await f.load();
+        else if (f instanceof GDir) await f.load();
+
+        f.dump(join(dir ?? ".", this.name));
+      }
+    },
+  };
 }

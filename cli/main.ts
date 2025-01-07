@@ -3,14 +3,14 @@ import { defineCoreTemplate } from "./src/builtin/core.ts";
 import {
   getBuiltinTemplate,
   getTemplate,
-  getTemplateType,
-  getTemplateUrl,
+  parseTemplateIdentifier,
   TemplateType,
 } from "./src/plugin.ts";
 import { runTemplate } from "./src/run.ts";
 import { BaseTemplate } from "@grayprint/core";
 import { join } from "jsr:@std/path/join";
 import { isAbsolute } from "jsr:@std/path/is-absolute";
+import { unpackTemplate } from "./src/unpack.ts";
 
 type FlagType = "boolean" | "string" | "list";
 
@@ -20,16 +20,24 @@ const flags: {
     alias?: string;
     required?: boolean;
     usage?: string;
+    default?: string | boolean | string[];
   };
 } = {
   help: {
     type: "boolean",
+    alias: "h",
     usage: "Prints out help information",
   },
   template: {
     type: "string",
     alias: "t",
     usage: "Specifies a template to use to generate grayprint code",
+  },
+  unpack: {
+    type: "boolean",
+    alias: "u",
+    usage:
+      "Just copy and paste the code in the given template as the final template",
   },
 };
 const flagEntries = Object.entries(flags);
@@ -59,9 +67,9 @@ function printUsage() {
   console.log("\n%cFlags:", "font-weight: bold");
   for (const [flag, info] of flagEntries) {
     console.log(
-      `\t${info.alias ? "-" + info.alias + "," : "   "} --${flag}\t\t${
-        info.usage ?? ""
-      }`,
+      `\t${info.alias ? "-" + info.alias + "," : "   "} --${flag}${
+        info.type === "string" ? " <value>" : "\t"
+      }\t${info.usage ?? ""}`,
     );
   }
 }
@@ -79,20 +87,29 @@ const cwd = args._.length === 0
   ? args._[0] as string
   : join(Deno.cwd(), args._[0] as string);
 
-const templateType = args.template
-  ? getTemplateType(args.template)
-  : TemplateType.Core;
+const parsedTempl = args.template
+  ? parseTemplateIdentifier(args.template)
+  : undefined;
+const templateType = parsedTempl ? parsedTempl.type : TemplateType.Core;
 // run basic template
 /** @todo Find a better way to do this */
-const template: BaseTemplate = args.template
+const template: BaseTemplate = parsedTempl
   ? templateType === TemplateType.Builtin
-    ? getBuiltinTemplate(args.template)
-    : getTemplate(getTemplateUrl(args.template))
+    ? getBuiltinTemplate(parsedTempl)
+    : await getTemplate(parsedTempl)
   : defineCoreTemplate();
 
-await runTemplate(template, {
-  type: templateType,
-  cwd,
-});
+if (args.unpack) {
+  // unpack template
+  await unpackTemplate(template, parsedTempl, {
+    cwd,
+  });
+} else {
+  // run template
+  await runTemplate(template, {
+    ident: parsedTempl,
+    cwd,
+  });
+}
 
 Deno.exit(0);

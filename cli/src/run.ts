@@ -10,13 +10,13 @@ import { optionToPrompt } from "./runner/questionnaire.ts";
 import { getValue } from "./utils/getValue.ts";
 import { buildContext } from "./runner/context.ts";
 import { Application } from "./apps/base.ts";
-import { TemplateType } from "./plugin.ts";
+import { TemplateIdentifier, TemplateType } from "./plugin.ts";
 import { join } from "jsr:@std/path/join";
 import { blue } from "jsr:@std/fmt/colors";
 
 /** Runs a template */
 export async function runTemplate(template: BaseTemplate, options?: {
-  type: TemplateType;
+  ident?: TemplateIdentifier;
   cwd?: string;
 }) {
   // first of all, get the template name
@@ -54,7 +54,7 @@ export async function runTemplate(template: BaseTemplate, options?: {
   const context = template.beforeCreate
     ? new Application({
       name: templName,
-      templateType: options?.type ?? TemplateType.Core,
+      templateType: options?.ident?.type ?? TemplateType.Core,
       typescript: preContext.config["typescript"] as boolean | undefined ??
         false,
       runtime: preContext.config["runtime"] as TemplateRuntime,
@@ -63,7 +63,7 @@ export async function runTemplate(template: BaseTemplate, options?: {
       git: preContext.config["git"] as boolean | undefined ?? true,
     })
     : Application.fromContext(preContext, {
-      templateType: options?.type ?? TemplateType.Core,
+      templateType: options?.ident?.type ?? TemplateType.Core,
     });
 
   if (template.runtimes.length === 1) {
