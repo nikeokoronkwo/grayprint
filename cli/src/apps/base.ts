@@ -14,6 +14,10 @@ import {
   TemplatePaths,
   TemplateRuntime,
   TemplateToolContext,
+  ESLintTool,
+  PrettierTool,
+  SassTool,
+  TailwindTool,
 } from "@grayprint/core";
 
 import { TemplateBuiltConfig } from "../utils/config.ts";
@@ -23,12 +27,6 @@ import tailwind from "../tools/tailwind.ts";
 import eslint from "../tools/eslint.ts";
 import sass from "../tools/sass.ts";
 import prettier from "../tools/prettier.ts";
-import {
-  ESLintTool,
-  PrettierTool,
-  SassTool,
-  TailwindTool,
-} from "../../../packages/core/builtin.ts";
 
 //deno-lint-ignore no-explicit-any
 type isPromise<T> = T extends Promise<any> ? true : false;
