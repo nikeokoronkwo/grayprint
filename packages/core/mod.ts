@@ -55,6 +55,9 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
    */
   git: boolean;
 
+  /** Creates a package.json or deno.json in the current project directory, using available information if any */
+  init(): void;
+
   /**
    * The runtime that the project is running on.
    *

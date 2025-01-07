@@ -212,6 +212,24 @@ export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
     return this.runSync("git", "init");
   }
 
+  init(): void {
+    switch (this.runtime) {
+      case "deno":
+        this.writeFile('deno.json', JSON.stringify({
+          name: this.config['name'] ?? this.name,
+          version: this.config['version'] ?? "0.1.0"
+        }));
+        break;
+      case "node":
+      case "bun":
+        this.writeFile('package.json', JSON.stringify({
+          name: this.config['name'] ?? this.name,
+          version: this.config['version'] ?? "0.1.0"
+        }));
+        break;
+    }
+  }
+
   use<U extends BaseToolOptions = BaseToolOptions>(
     tool: BaseTool<U>,
     options?: U,

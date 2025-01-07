@@ -1,6 +1,7 @@
 import { TemplateOptions } from "@grayprint/core";
 // @deno-types="npm:@types/prompts@2.4.9"
 import { PromptObject } from "npm:prompts@2.4.2";
+import { InvalidOptionError } from "../errors/invalidOptionError.ts";
 
 /**
  * @todo Add more question options:
@@ -21,8 +22,9 @@ export function optionToPrompt(
     };
   } else if (option.type === "list" || "options" in option) {
     if (typeof option.options === "function") {
-      throw new Error(
+      throw new InvalidOptionError(
         "Options as functions are not implemented yet. File an issue",
+        option
       );
     }
     return option.multiple

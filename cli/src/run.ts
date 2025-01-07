@@ -10,7 +10,8 @@ import { getValue } from "./utils/getValue.ts";
 import { buildContext } from "./runner/context.ts";
 import { Application } from "./apps/base.ts";
 import { TemplateIdentifier, TemplateType } from "./plugin.ts";
-import { blue } from "jsr:@std/fmt@1.0.2/colors";
+import { blue, red } from "jsr:@std/fmt@1.0.2/colors";
+import { InvalidOptionError } from "./errors/invalidOptionError.ts";
 
 /** Runs a template */
 export async function runTemplate(template: BaseTemplate, options?: {
@@ -22,7 +23,17 @@ export async function runTemplate(template: BaseTemplate, options?: {
 
   // get the options
   const opts = template.options;
-  const optionPrompts = opts.map((o, _, a) => optionToPrompt(o, a));
+
+  let optionPrompts: prompt.PromptObject<string>[] = [];
+
+  try {
+    optionPrompts = opts.map((o, _, a) => optionToPrompt(o, a));
+  } catch (error) {
+    if (error instanceof InvalidOptionError) {
+      throw error;
+    }
+    throw new TypeError(red("'options' must be passed. If you do not have any options, pass '[]'"), { cause: error })
+  }
 
   // run questionnaire based on options
   // TODO(@nikeokoronkwo): Arrangement and consideration of 'dependsOn' option

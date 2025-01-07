@@ -154,8 +154,10 @@ async function getNPMTemplate(
 }
 
 async function getTemplateFromPath(path: string, cwd?: string) {
+  console.log(cwd, path)
   const { config } = await loadConfig<BaseTemplate>({
     cwd: cwd ? join(cwd, path) : path,
+    name: 'grayprint'
   });
   return config;
 }

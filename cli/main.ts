@@ -95,8 +95,14 @@ const templateType = parsedTempl ? parsedTempl.type : TemplateType.Core;
 const template: BaseTemplate = parsedTempl
   ? templateType === TemplateType.Builtin
     ? getBuiltinTemplate(parsedTempl)
-    : await getTemplate(parsedTempl)
+    : await getTemplate(parsedTempl, cwd)
   : defineCoreTemplate();
+
+// console.group('Template Information')
+// console.info(template)
+// console.info(templateType)
+// console.info(parsedTempl)
+// console.groupEnd()
 
 if (args.unpack) {
   // unpack template
