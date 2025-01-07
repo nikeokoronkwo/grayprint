@@ -1,18 +1,16 @@
 import {
   BaseTemplate,
-  ListTemplateOptions,
   TemplatePackageManager,
   TemplateRuntime,
 } from "@grayprint/core";
-// @deno-types="npm:@types/prompts"
-import prompt from "npm:prompts";
+// @deno-types="npm:@types/prompts@2.4.9"
+import prompt from "npm:prompts@2.4.2";
 import { optionToPrompt } from "./runner/questionnaire.ts";
 import { getValue } from "./utils/getValue.ts";
 import { buildContext } from "./runner/context.ts";
 import { Application } from "./apps/base.ts";
 import { TemplateIdentifier, TemplateType } from "./plugin.ts";
-import { join } from "jsr:@std/path/join";
-import { blue } from "jsr:@std/fmt/colors";
+import { blue } from "jsr:@std/fmt@1.0.2/colors";
 
 /** Runs a template */
 export async function runTemplate(template: BaseTemplate, options?: {
@@ -27,8 +25,7 @@ export async function runTemplate(template: BaseTemplate, options?: {
   const optionPrompts = opts.map((o, _, a) => optionToPrompt(o, a));
 
   // run questionnaire based on options
-  // todo: start with those without a 'dependsOn',
-  // todo: arrange the ones with 'dependsOn' before the given option,
+  // TODO(@nikeokoronkwo): Arrangement and consideration of 'dependsOn' option
   const optResults = await prompt(optionPrompts);
 
   // get all the values from each questionnaire, and assign it as a value to an object

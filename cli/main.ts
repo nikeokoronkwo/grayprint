@@ -1,4 +1,5 @@
-import { parseArgs } from "jsr:@std/cli";
+import { parseArgs } from "jsr:@std/cli@1.0.9";
+import { join, isAbsolute } from "jsr:@std/path@1.0.8";
 import { defineCoreTemplate } from "./src/builtin/core.ts";
 import {
   getBuiltinTemplate,
@@ -8,8 +9,6 @@ import {
 } from "./src/plugin.ts";
 import { runTemplate } from "./src/run.ts";
 import { BaseTemplate } from "@grayprint/core";
-import { join } from "jsr:@std/path/join";
-import { isAbsolute } from "jsr:@std/path/is-absolute";
 import { unpackTemplate } from "./src/unpack.ts";
 
 type FlagType = "boolean" | "string" | "list";

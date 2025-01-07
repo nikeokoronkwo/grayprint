@@ -3,8 +3,8 @@ import {
   TemplateContext,
   TemplateOptions,
 } from "@grayprint/core";
-// @deno-types="npm:@types/prompts"
-import prompts from "npm:prompts";
+// @deno-types="npm:@types/prompts@2.4.9"
+import prompts from "npm:prompts@2.4.2";
 
 import { optionToPrompt } from "./questionnaire.ts";
 import { getValue } from "../utils/getValue.ts";

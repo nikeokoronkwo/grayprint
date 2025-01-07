@@ -1,7 +1,7 @@
 import { TailwindOptions } from "@grayprint/core";
 import { defineCoreTool } from "./base.ts";
 import { FrameworkType, MetaFrameworkType } from "../core/frameworks.ts";
-import { bold, green, yellow } from "jsr:@std/fmt/colors";
+import { bold, green, yellow } from "jsr:@std/fmt@1.0.2/colors";
 
 const TailwindFrameworks = [
   "react",

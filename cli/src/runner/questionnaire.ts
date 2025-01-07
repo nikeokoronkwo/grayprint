@@ -1,6 +1,6 @@
 import { TemplateOptions } from "@grayprint/core";
-// @deno-types="npm:@types/prompts"
-import { PromptObject } from "npm:prompts";
+// @deno-types="npm:@types/prompts@2.4.9"
+import { PromptObject } from "npm:prompts@2.4.2";
 
 /**
  * @todo Add more question options:

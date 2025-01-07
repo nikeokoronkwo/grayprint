@@ -1,5 +1,6 @@
 {
   "name": "@grayprint/create",
+  "license": "MIT",
   "version": "0.0.1-pre",
   "exports": "./mod.ts"
 }

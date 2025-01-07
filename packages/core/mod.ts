@@ -108,11 +108,11 @@ export class TemplateEnv {
     this.env = new Map();
   }
 
-  get(name: string) {
+  get(name: string): string | undefined {
     return this.env.get(name) ?? Deno.env.get(name);
   }
-  set(name: string, value: string) {
-    return this.env.set(name, value);
+  set(name: string, value: string): void {
+    this.env.set(name, value);
   }
 
   dump(envFile?: string): string {

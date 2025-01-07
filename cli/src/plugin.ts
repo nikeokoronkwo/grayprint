@@ -1,6 +1,6 @@
 /** File used for loading and defining plugins */
 
-import { loadConfig } from "npm:c12";
+import { loadConfig } from "npm:c12@2.0.1";
 import { BaseTemplate } from "@grayprint/core";
 import { defineCoreTemplate } from "./builtin/core.ts";
 import { octokit } from "./plugin/github.ts";

@@ -1,6 +1,6 @@
 import { ESLintOptions } from "@grayprint/core";
 import { defineCoreTool } from "./base.ts";
-import prettier from "npm:@prettier/sync";
+import prettier from "npm:@prettier/sync@0.5.2";
 
 export default defineCoreTool<ESLintOptions>({
   name: "eslint",

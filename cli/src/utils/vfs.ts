@@ -2,7 +2,7 @@
  * The Virtual File System Implementation
  */
 
-import { join } from "jsr:@std/path/join";
+import { join } from "jsr:@std/path@1.0.8/join";
 
 export abstract class VFileSystemEntity {
   abstract get name(): string;

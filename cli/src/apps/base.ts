@@ -1,6 +1,6 @@
-import { red } from "jsr:@std/fmt/colors";
-import { isAbsolute, join } from "jsr:@std/path";
-import { exists } from "jsr:@std/fs/exists";
+import { red } from "jsr:@std/fmt@1.0.2/colors";
+import { isAbsolute, join } from "jsr:@std/path@1.0.8";
+import { exists } from "jsr:@std/fs@1.0.6/exists";
 
 import {
   BaseTool,
