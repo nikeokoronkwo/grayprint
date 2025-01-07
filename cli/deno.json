@@ -1,6 +1,5 @@
 {
   "name": "@grayprint/cli",
   "license": "../LICENSE",
-  "version": "0.0.1-pre",
-  "exports": "./main.ts"
+  "version": "0.0.1-pre"
 }
