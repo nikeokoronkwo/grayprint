@@ -34,7 +34,7 @@ const GFile = class extends VFile implements GFileSystemIdentity {
 const GDir = class extends VDirectory implements GFileSystemIdentity {
   override name: string;
   override get files(): VFileSystemEntity[] {
-    return this.obj.map((o) => {
+    return this.obj.map((o: any) => {
       if (o.type === "dir") return new GDir(o, o.name);
       else if (o.type === "file") return new GFile(o);
       else throw new Error(`Unsupported File System: ${o}`);
@@ -133,7 +133,7 @@ export async function loadGithubDir(
 
   return {
     name: repoDir ?? ".",
-    files: data.map((d) => {
+    files: data.map((d: any) => {
       if (d.type === "file") return new GFile(d);
       else if (d.type === "dir") return new GDir(d, d.name);
       else throw new Error("Unsupported file");
