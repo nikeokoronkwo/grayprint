@@ -1,4 +1,4 @@
-//deno-lint-ignore no-unused-vars -- vars used in JSDoc
+//deno-lint-ignore-file no-unused-vars no-explicit-any -- vars used in JSDoc, and any type needed for record
 import {
   BuiltContext,
   commonQuestions,
@@ -35,7 +35,7 @@ type isInitAsync<T extends (...args: any) => any> = ReturnType<T> extends
   Promise<any> ? true : false;
 type IsFunction<T> = T extends (...args: any[]) => any ? true : false;
 
-// TODO: Document
+// TODO(@nikeokoronkwo): Document
 export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   extends TemplateContext<T>, BuiltContext {
   env: TemplateEnv;

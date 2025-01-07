@@ -1,4 +1,4 @@
-import { BaseToolOptions, TailwindOptions } from "@grayprint/core";
+import { TailwindOptions } from "@grayprint/core";
 import { defineCoreTool } from "./base.ts";
 import { FrameworkType, MetaFrameworkType } from "../core/frameworks.ts";
 import { bold, green, yellow } from "jsr:@std/fmt/colors";

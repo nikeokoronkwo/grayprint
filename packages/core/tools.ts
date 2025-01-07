@@ -15,6 +15,7 @@ export interface TemplateToolContext<
 }
 
 export interface BaseToolOptions {
+  //deno-lint-ignore no-explicit-any
   [k: string]: any;
 }
 

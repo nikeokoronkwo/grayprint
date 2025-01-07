@@ -1,7 +1,7 @@
 import { TemplateBuiltConfig } from "../utils/config.ts";
 import { Application, ApplicationOptions } from "./base.ts";
 import { VDirectory, VFile, VFileSystemEntity } from "../utils/vfs.ts";
-import { isAbsolute, join } from "jsr:@std/path@^1.0.8";
+import { join } from "jsr:@std/path@^1.0.8";
 
 abstract class GFileSystemIdentity extends VFileSystemEntity {
   abstract load(): Promise<void>;
@@ -100,12 +100,11 @@ export class GithubApplication<
     );
   }
 
-  override copyFile(from: string, dest: string): void {
-  }
+  override copyFile(from: string, dest: string): void {}
 
   override copyDir(from: string, dest: string): void {
-    if (isAbsolute(from)) throw new Error("Cannot make use of absolute paths");
-    const dir = this.load(from);
+    // if (isAbsolute(from)) throw new Error("Cannot make use of absolute paths");
+    // const dir = this.load(from);
   }
 }
 

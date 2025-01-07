@@ -71,22 +71,22 @@ export function defineCoreTemplate(): CoreTemplate {
         } else if (app.config["frontend"] === "Angular") {
           // angular options
         } else {
-          const m = Object.entries(frameworks).find(([name, fw]) =>
-            name === app.config["frontend"]?.toString().toLowerCase() ||
-            fw.name === app.config["frontend"]
-          )?.[1].meta;
-          const metaOptions = m?.map((opt) => opt.name) ?? [];
+          // const m = Object.entries(frameworks).find(([name, fw]) =>
+          //   name === app.config["frontend"]?.toString().toLowerCase() ||
+          //   fw.name === app.config["frontend"]
+          // )?.[1].meta;
+          // const metaOptions = m?.map((opt) => opt.name) ?? [];
 
-          if (metaOptions.length !== 0) {
-            app.log(`Defaulting to ${metaOptions[0]}`);
-            meta = metaOptions[0];
-          } else if (!meta || metaOptions.length !== 0) {
-            meta = await app.question({
-              name: "metaframework",
-              question: "What metaframework do you want to use?",
-              options: metaOptions,
-            });
-          }
+          // if (metaOptions.length !== 0) {
+          //   app.log(`Defaulting to ${metaOptions[0]}`);
+          //   meta = metaOptions[0];
+          // } else if (!meta || metaOptions.length !== 0) {
+          //   meta = await app.question({
+          //     name: "metaframework",
+          //     question: "What metaframework do you want to use?",
+          //     options: metaOptions,
+          //   });
+          // }
         }
       } else if (app.config["frontend"] === "React") {
         swc = await app.question({
@@ -99,38 +99,38 @@ export function defineCoreTemplate(): CoreTemplate {
 
       // check if the user wants to integrate a mobile application
       let mobile_framework;
-      const mobile = await app.question({
-        name: "application",
-        question: "Do you want to make a mobile application as well?",
-        type: "boolean",
-        default: false,
-      });
+      // const mobile = await app.question({
+      //   name: "application",
+      //   question: "Do you want to make a mobile application as well?",
+      //   type: "boolean",
+      //   default: false,
+      // });
 
-      if (mobile) {
-        const mobile_framework_options = ["Capacitor", "NativeScript"];
-        switch (app.config["frontend"]) {
-          case "React":
-            mobile_framework_options.push(
-              "React Native",
-              "Ionic",
-            );
-            break;
-          case "Vue":
-            mobile_framework_options.push("Ionic");
-            break;
-          case "Angular":
-            mobile_framework_options.push("Ionic");
-            break;
-          default:
-            break;
-        }
-        const mobile_framework = await app.question({
-          name: "mobile_framework",
-          question: "What mobile application framework do you want to use?",
-          type: "list",
-          options: mobile_framework_options,
-        });
-      }
+      // if (mobile) {
+      //   const mobile_framework_options = ["Capacitor", "NativeScript"];
+      //   switch (app.config["frontend"]) {
+      //     case "React":
+      //       mobile_framework_options.push(
+      //         "React Native",
+      //         "Ionic",
+      //       );
+      //       break;
+      //     case "Vue":
+      //       mobile_framework_options.push("Ionic");
+      //       break;
+      //     case "Angular":
+      //       mobile_framework_options.push("Ionic");
+      //       break;
+      //     default:
+      //       break;
+      //   }
+      //   const mobile_framework = await app.question({
+      //     name: "mobile_framework",
+      //     question: "What mobile application framework do you want to use?",
+      //     type: "list",
+      //     options: mobile_framework_options,
+      //   });
+      // }
 
       let pms: TemplatePackageManager[] = [];
       switch (app.config["platform"]) {
@@ -157,6 +157,7 @@ export function defineCoreTemplate(): CoreTemplate {
         meta,
         backend,
         packageManager,
+        swc,
       };
     },
     /** @todo Make tools like eslint 'tools' rather than 'options' */
@@ -174,6 +175,7 @@ export function defineCoreTemplate(): CoreTemplate {
         const templ = getViteTemplate(
           app.config["frontend"] as string,
           app.config["typescript"] as boolean,
+          app.config["swc"] as boolean,
         );
 
         if (app.config["vite"] === "SPA") {
@@ -191,7 +193,7 @@ export function defineCoreTemplate(): CoreTemplate {
 
         app.chDir(app.config["name"] as string);
       } else {
-        // todo: scaffold metaframework
+        // TODO(@nikeokoronkwo): scaffold and set up scaffolding for metaframeworks
       }
 
       // scaffold application if any

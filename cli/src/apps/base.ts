@@ -1,5 +1,5 @@
-import { blue, red } from "jsr:@std/fmt/colors";
-import { isAbsolute, join, relative } from "jsr:@std/path";
+import { red } from "jsr:@std/fmt/colors";
+import { isAbsolute, join } from "jsr:@std/path";
 import { exists } from "jsr:@std/fs/exists";
 
 import {
@@ -30,10 +30,13 @@ import {
   TailwindTool,
 } from "../../../packages/core/builtin.ts";
 
+//deno-lint-ignore no-explicit-any
 type isPromise<T> = T extends Promise<any> ? true : false;
 
-function updateConfigFile(file: string, addedConfig: object) {
-  throw new Error("Unimplemented");
+function updateConfigFile(_file: string, _addedConfig: object) {
+  throw new Error(
+    "Support for manipulating configuration files has not been added yet: File an issue concerning this incase an issue doesn't exist",
+  );
 }
 
 export interface ApplicationOptions<
@@ -47,6 +50,7 @@ export interface ApplicationOptions<
   cwd?: string;
   verbose?: boolean;
   git?: boolean;
+  //deno-lint-ignore no-explicit-any
   cfg?: Record<string, any>;
 }
 
@@ -141,7 +145,7 @@ export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
     const contents = await Deno.readTextFile(
       join(this.cwd, this.configFileName),
     );
-    let jsonContents = JSON.parse(contents);
+    const jsonContents = JSON.parse(contents);
     for (const k in jsonContents) {
       switch (typeof jsonContents[k]) {
         case "object":
@@ -163,9 +167,9 @@ export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
   }
 
   private updateContext<T extends BaseToolOptions = BaseToolOptions>(
-    res: TemplateToolContext<T>,
+    _res: TemplateToolContext<T>,
   ) {
-    // throw new Error("Unimplemented");
+    // nothing
   }
 
   private getInstallArgs(tool: string, options?: {
@@ -194,6 +198,7 @@ export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
   commands: TemplateCommands & { installDeps: string[] };
   cwd: string;
   git: boolean;
+  //deno-lint-ignore no-explicit-any
   configFile: Record<string, any> = {};
 
   public get configFileName(): string {
@@ -210,6 +215,7 @@ export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
   use<U extends BaseToolOptions = BaseToolOptions>(
     tool: BaseTool<U>,
     options?: U,
+    //deno-lint-ignore no-explicit-any
   ): (ReturnType<BaseTool<U>["init"]> extends Promise<any> ? true
     : false) extends true ? Promise<void> : void {
     const res = tool.init({
@@ -243,8 +249,10 @@ export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
             error: this.error,
           },
         })
+        //deno-lint-ignore no-explicit-any
       ) as any;
     }
+    //deno-lint-ignore no-explicit-any
     return undefined as any;
   }
 
@@ -269,7 +277,7 @@ export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
       args: args.length === 1 ? [] : args.slice(1),
       cwd: this.cwd,
     } /* : { args: args.length === 1 ? [] : args.slice(1), cwd: this.cwd, stdin: 'piped', stdout: 'piped', stderr: 'piped' } */);
-    const { success, stderr, stdout } = await command.output();
+    const { success, stderr } = await command.output();
 
     if (!success) this.error(new TextDecoder().decode(stderr));
   }
@@ -281,7 +289,7 @@ export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
       args: args.length === 1 ? [] : args.slice(1),
       cwd: this.cwd,
     } /* : { args: args.length === 1 ? [] : args.slice(1), cwd: this.cwd, stdin: 'piped', stdout: 'piped', stderr: 'piped' } */);
-    const { success, stderr, stdout } = command.outputSync();
+    const { success, stderr } = command.outputSync();
 
     if (!success) {
       this.error(new TextDecoder().decode(stderr));
@@ -337,14 +345,14 @@ export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
    * - Run code with VFS
    * - Delete and cleanup afterwards
    */
-  copyFile(from: string, dest: string) {
+  copyFile(_from: string, _dest: string) {
     throw new Error("Not implemented for this class");
   }
-  copyDir(from: string, dest: string) {
+  copyDir(_from: string, _dest: string) {
     throw new Error("Not implemented for this class");
   }
 
-  question(q: TemplateOptions): PromiseLike<string | boolean | string[]> {
+  question(_q: TemplateOptions): PromiseLike<string | boolean | string[]> {
     throw new Error(
       "Cannot use question query on built context. Run on `beforeCreate` to fix this error.",
     );
@@ -352,6 +360,7 @@ export class Application<T extends TemplateBuiltConfig = TemplateBuiltConfig>
 
   log = console.log;
 
+  //deno-lint-ignore no-explicit-any
   error(msg: any) {
     console.error(red(msg));
     Deno.exit(1);

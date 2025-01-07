@@ -85,20 +85,12 @@ export function parseTemplateIdentifier(ident: string): TemplateIdentifier {
   }
 }
 
-/**
- * Get the URL for the template identified
- * @param identifier
- */
-export function getTemplateUrl(templ: TemplateIdentifier): URL {
-  // basic: URL of file path
-  //
-  throw new Error("Unimplemented");
-}
-
 export function getBuiltinTemplate(
   identifier: TemplateIdentifier,
 ): BaseTemplate {
-  throw new Error("Unimplemented");
+  throw new Error(
+    "Builtin templates have not yet been implemented. For more information see: https://github.com/nikeokoronkwo/grayprint/issues/1",
+  );
 }
 
 export async function getTemplate(
@@ -110,7 +102,7 @@ export async function getTemplate(
       return defineCoreTemplate();
     case TemplateType.Builtin:
       throw new Error(
-        "Builtin templates have not yet been implemented. For more information see: ",
+        "Builtin templates have not yet been implemented. For more information see: https://github.com/nikeokoronkwo/grayprint/issues/1",
       );
     case TemplateType.Path:
       return await getTemplateFromPath((templ.parts as SingleParts).path, cwd);
@@ -178,8 +170,4 @@ async function getJSRTemplate(name: string, scope: string) {
     // handle error
     throw new Error((error as Error).message);
   }
-}
-
-export function isBuiltinTemplate(identifier: string) {
-  throw new Error("Unimplemented");
 }

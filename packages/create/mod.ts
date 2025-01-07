@@ -1,10 +1,10 @@
-//deno-lint-ignore-file no-explicit-any
-import type { BaseTemplate, BaseTool } from "@grayprint/core";
+import type { BaseTemplate, BaseTool, BaseToolOptions } from "@grayprint/core";
 export { commonQuestions } from "@grayprint/core";
 
 export interface Template extends BaseTemplate {}
 
-export interface Tool<T = {}> extends BaseTool<T> {}
+export interface Tool<T extends BaseToolOptions = BaseToolOptions>
+  extends BaseTool<T> {}
 
 /**
  * A function used for defining a grayprint template
@@ -20,6 +20,8 @@ export function defineTemplate(template: Template): Template {
  * @param tool
  * @returns
  */
-export function defineTool<T = {}>(tool: Tool<T>): Tool<T> {
+export function defineTool<T extends BaseToolOptions = BaseToolOptions>(
+  tool: Tool<T>,
+): Tool<T> {
   return tool;
 }
