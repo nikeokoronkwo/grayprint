@@ -1,0 +1,15 @@
+{
+  "LABEL": {
+    "name": "title needs formatting",
+    "color": "FF0000"
+  },
+  "CHECKS": {
+    "regexp": "^(BREAKING|feat|fix|perf|docs|deprecation|refactor|test|style|chore)\\(([^)]+)\\): .+",
+    "regexpFlags": "i",
+    "ignoreLabels": ["skip-pr-title-check"]
+  },
+  "MESSAGES": {
+    "success": "PR title format is correct.",
+    "failure": "PR title must follow the format: <tag>(<scopes>): <pr title>. Example: 'feat(core): add new caching mechanism'."
+  }
+}
