@@ -13,7 +13,11 @@ import { TemplateIdentifier, TemplateType } from "./plugin.ts";
 import { blue, red } from "jsr:@std/fmt@1.0.2/colors";
 import { InvalidOptionError } from "./errors/invalidOptionError.ts";
 
-/** Runs a template */
+/** @todo Add support for running custom templates */
+
+/** 
+ * Runs a template 
+ */
 export async function runTemplate(template: BaseTemplate, options?: {
   ident?: TemplateIdentifier;
   cwd?: string;

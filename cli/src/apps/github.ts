@@ -66,6 +66,7 @@ const GDir = class extends VDirectory implements GFileSystemIdentity {
 
 /**
  * A built application context to be used for templates from Github
+ * @todo Implement Github TODO
  */
 export class GithubApplication<
   T extends TemplateBuiltConfig = TemplateBuiltConfig,
