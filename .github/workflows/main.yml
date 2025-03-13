@@ -29,7 +29,6 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2.0.2
         with:
-          # The Deno version to install. Can be a semver version of a stable release, "canary" for the latest canary, or the Git hash of a specific canary release.
           deno-version: 2.2.0
           # # File containing the Deno version to install, such as .dvmrc or .tool-versions.
           # deno-version-file: # optional
@@ -46,3 +45,6 @@ jobs:
 
       - name: Run tests
         run: deno test -A
+
+      - name: Run doc tests
+        run: deno test --doc

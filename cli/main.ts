@@ -90,6 +90,7 @@ const parsedTempl = args.template
   ? parseTemplateIdentifier(args.template)
   : undefined;
 const templateType = parsedTempl ? parsedTempl.type : TemplateType.Core;
+
 // run basic template
 /** @todo Find a better way to do this */
 const template: BaseTemplate = parsedTempl
