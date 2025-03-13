@@ -4,7 +4,7 @@ name: Test CLI
 
 on:
   # push:
-  #   branches: ["main"]
+  #   branches: ["main", "stable"]
   #   paths:
   #     - '.github/workflows/cli.yaml'
   #     - 'cli/**'
