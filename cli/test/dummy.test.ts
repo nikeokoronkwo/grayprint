@@ -1,2 +1,2 @@
-Deno.test(() => {
+Deno.test("Dummy test", () => {
 });
