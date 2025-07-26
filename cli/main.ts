@@ -1,15 +1,6 @@
-import { parseArgs } from "jsr:@std/cli@1.0.9";
-import { join, isAbsolute } from "jsr:@std/path@1.0.8";
-import { defineCoreTemplate } from "./src/builtin/core.ts";
-import {
-  getBuiltinTemplate,
-  getTemplate,
-  parseTemplateIdentifier,
-  TemplateType,
-} from "./src/plugin.ts";
-import { runTemplate } from "./src/run.ts";
-import { BaseTemplate } from "@grayprint/core";
-import { unpackTemplate } from "./src/unpack.ts";
+import { Args, parseArgs } from "jsr:@std/cli/parse-args";
+import { getParsedTemplate } from "./src/cli.ts";
+import { runTemplate } from "./src/index.ts";
 
 type FlagType = "boolean" | "string" | "list";
 
@@ -32,6 +23,12 @@ const flags: {
     alias: "t",
     usage: "Specifies a template to use to generate grayprint code",
   },
+  config: {
+    type: "string",
+    alias: "c",
+    usage:
+      'Unless a config file is passed, specify the config file to use. Defaults to "grayprint.config.{js,ts}" if any',
+  },
   unpack: {
     type: "boolean",
     alias: "u",
@@ -39,6 +36,7 @@ const flags: {
       "Just copy and paste the code in the given template as the final template",
   },
 };
+
 const flagEntries = Object.entries(flags);
 
 /**
@@ -48,15 +46,15 @@ const flagEntries = Object.entries(flags);
 function parseArguments(args: string[]) {
   return parseArgs(args, {
     string: flagEntries
-      .filter(([k, v]) => v.type === "string")
-      .map(([k, v]) => k),
+      .filter(([_, v]) => v.type === "string")
+      .map(([k, _]) => k),
     boolean: flagEntries
-      .filter(([k, v]) => v.type === "boolean")
-      .map(([k, v]) => k),
+      .filter(([_, v]) => v.type === "boolean")
+      .map(([k, _]) => k),
     alias: flagEntries
-      .filter(([k, v]) => v.alias)
+      .filter(([_, v]) => v.alias)
       .reduce((a, [k, v]) => ({ ...a, [k]: v.alias }), {}),
-  });
+  }) as Args;
 }
 
 /** Print out command line usage */
@@ -73,49 +71,27 @@ function printUsage() {
   }
 }
 
-// Get command line arguments
-const args = parseArguments(Deno.args);
-if (args.help) {
-  printUsage();
-  Deno.exit(0);
-}
+if (import.meta.main) {
+  const args = parseArguments(Deno.args);
 
-const cwd = args._.length === 0
-  ? Deno.cwd()
-  : (isAbsolute(args._[0] as string))
-  ? args._[0] as string
-  : join(Deno.cwd(), args._[0] as string);
+  if (args.help) {
+    printUsage();
+    Deno.exit(0);
+  }
 
-const parsedTempl = args.template
-  ? parseTemplateIdentifier(args.template)
-  : undefined;
-const templateType = parsedTempl ? parsedTempl.type : TemplateType.Core;
+  // once we get args, deduce type
+  const template = await getParsedTemplate(args.template, args.config);
 
-// run basic template
-/** @todo Find a better way to do this */
-const template: BaseTemplate = parsedTempl
-  ? templateType === TemplateType.Builtin
-    ? getBuiltinTemplate(parsedTempl)
-    : await getTemplate(parsedTempl, cwd)
-  : defineCoreTemplate();
+  // get template type
+  if (args.unpack) {
+    await template?.unpack(args._[0] as string);
+    Deno.exit(0);
+  }
 
-// console.group('Template Information')
-// console.info(template)
-// console.info(templateType)
-// console.info(parsedTempl)
-// console.groupEnd()
-
-if (args.unpack) {
-  // unpack template
-  await unpackTemplate(template, parsedTempl, {
-    cwd,
-  });
-} else {
   // run template
-  await runTemplate(template, {
-    ident: parsedTempl,
-    cwd,
-  });
+  if (template) await runTemplate(template, args._[0] as string);
+  else {
+    console.error("Could not get template");
+    Deno.exit(1);
+  }
 }
-
-Deno.exit(0);

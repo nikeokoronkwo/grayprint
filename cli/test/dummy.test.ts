@@ -1,0 +1,2 @@
+Deno.test("Dummy test", () => {
+});

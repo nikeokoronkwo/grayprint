@@ -1,6 +1,6 @@
 # TODO: Add coverage and benchmarking
 
-name: Test CLI 
+name: Test CLI
 
 on:
   # push:
@@ -11,8 +11,8 @@ on:
   pull_request:
     branches: ["main", "stable"]
     paths:
-      - '.github/workflows/cli.yaml'
-      - 'cli/**'
+      - ".github/workflows/cli.yaml"
+      - "cli/**"
 
 permissions:
   contents: read

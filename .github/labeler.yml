@@ -1,11 +1,11 @@
-'infra':
+"infra":
   - changed-files:
-    - any-glob-to-any-file: '.github/**'
+      - any-glob-to-any-file: ".github/**"
 
-'cli':
+"cli":
   - changed-files:
-    - any-glob-to-any-file: 'cli/**'
+      - any-glob-to-any-file: "cli/**"
 
-'api':
+"api":
   - changed-files:
-    - any-glob-to-any-file: ['packages/create/**', 'packages/core/**']
+      - any-glob-to-any-file: ["packages/create/**", "packages/core/**"]

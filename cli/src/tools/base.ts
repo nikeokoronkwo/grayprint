@@ -1,8 +1,4 @@
-import {
-  BaseTool,
-  BaseToolOptions,
-  TemplateToolContext,
-} from "@grayprint/core";
+import { BaseTool, BaseToolOptions } from "@grayprint/core";
 
 export interface CoreTool<T extends BaseToolOptions = BaseToolOptions>
   extends BaseTool<T> {

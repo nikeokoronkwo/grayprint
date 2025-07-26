@@ -4,13 +4,24 @@ import prettier from "npm:@prettier/sync@0.5.2";
 
 export default defineCoreTool<ESLintOptions>({
   name: "eslint",
+  version: "latest",
   init(context) {
     try {
       const c = context.readFileSync("eslint.config.js");
-      return;
-    } catch (error) {
+      if (c.length !== 0) return;
+    } catch (_) {
       // eslint not exists
     }
+
+    if (context.options.config) {
+      context.packages.create(
+        "@eslint/config@latest",
+        "--config",
+        context.options.config,
+      );
+      return;
+    }
+
     context.installSync("eslint", { dev: true });
     context.installSync("@eslint/js", { dev: true });
 

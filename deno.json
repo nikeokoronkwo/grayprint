@@ -2,7 +2,8 @@
   "workspace": [
     "./cli",
     "./packages/core",
-    "./packages/create"
+    "./packages/create",
+    "./examples/*"
   ],
   "tasks": {
     "dev": "deno run -A cli/main.ts",
@@ -19,7 +20,6 @@
     "rules": {
       "tags": ["recommended"],
       "include": ["ban-untagged-todo"]
-    },
-    "plugins": ["jsr:@nikechukwu/doclint"]
+    }
   }
 }

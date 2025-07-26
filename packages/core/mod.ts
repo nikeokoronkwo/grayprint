@@ -1,9 +1,10 @@
 //deno-lint-ignore-file no-unused-vars no-explicit-any -- vars used in JSDoc, and any type needed for record
 import {
-  BuiltContext,
   commonQuestions,
+  IOInterfaceMixin,
   TemplateContext,
   TemplateOptions,
+  TemplatePackageInterface,
 } from "./base.ts";
 import { ESLintTool, PrettierTool, SassTool, TailwindTool } from "./builtin.ts";
 import {
@@ -13,31 +14,19 @@ import {
   TemplateRuntime,
 } from "./tools.ts";
 
-/**
- * An object used to encapsulate important arguments for commands for a given package manager
- */
-export interface TemplateCommands {
-  install: string[];
-  create: string[];
-  /** Commands for running scripts or packages like `pnpm/yarn dlx` */
-  run: string[];
-  /** Commands for running scripts or packages like `pnpm/yarn exec` */
-  exec: string[];
-  start: string[];
-  remove: string[];
-  mappings: {
-    dev: string;
-    exact: string;
-  };
-}
-
 type isInitAsync<T extends (...args: any) => any> = ReturnType<T> extends
   Promise<any> ? true : false;
 type IsFunction<T> = T extends (...args: any[]) => any ? true : false;
 
-// TODO(@nikeokoronkwo): Document
+export interface DotEnvOptions {
+  type?: string;
+}
+
+/**
+ * A built template context, used during {@link BaseTemplate.create} for building the template
+ */
 export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
-  extends TemplateContext<T>, BuiltContext {
+  extends TemplateContext<T>, IOInterfaceMixin {
   env: TemplateEnv;
   /**
    * Whether typescript is enabled for this project
@@ -46,6 +35,16 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
    * For prompting, you can make use of {@link commonQuestions.typescript}
    */
   typescript: boolean;
+
+  /**
+   * Apply variables in a user's dotenv file(s), adding variables if any
+   *
+   * @param key
+   * @param value
+   * @param options
+   */
+  dotEnv(key: string, options?: DotEnvOptions): string | undefined;
+  dotEnv(key: string, value?: string, options?: DotEnvOptions): string;
 
   /**
    * Whether git is enabled for this project
@@ -73,7 +72,13 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
   path: TemplatePaths;
   copyFile: (from: string, dest: string) => void;
   copyDir: (from: string, dest: string) => void;
-  commands: TemplateCommands;
+  // commands: TemplateCommands;
+  packages: TemplatePackageInterface;
+
+  /**
+   * Added context usually gotten from `beforeCreate`
+   */
+  ctx: Record<string, any>;
 
   /**
    * Builtin tools from Grayprint
@@ -82,9 +87,26 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
    * @todo Document each property
    */
   tools: {
+    /**
+     * Tailwind Tool
+     *
+     * For more information, check out [Tailwind](https://tailwindcss.com)
+     */
     tailwind: TailwindTool;
+
+    /**
+     * ESLint Tool
+     *
+     * For more information, check out [ESLint](https://eslint.org)
+     */
     eslint: ESLintTool;
     sass: SassTool;
+
+    /**
+     * Prettier Tool
+     *
+     * For more information, check out [Prettier](https://prettier.io)
+     */
     prettier: PrettierTool;
   };
 
@@ -97,32 +119,21 @@ export interface TemplateBuiltContext<T extends TemplateOptions[] = []>
 
   /** A synchronised version of the `initGit` function */
   initGitSync(): void;
+
+  /** Get the current dir of the template, if any
+   *
+   * Useful when you'd want to copy/paste items from the template to the user's dir
+   */
+  get templateDir(): string;
 }
 
 export interface TemplatePaths {
   ROOT: string;
 }
 
-/** @todo Implement */
-export class TemplateEnv {
-  private env: Map<string, string>;
-
-  constructor() {
-    this.env = new Map();
-  }
-
-  get(name: string): string | undefined {
-    return this.env.get(name) ?? Deno.env.get(name);
-  }
-  set(name: string, value: string): void {
-    this.env.set(name, value);
-  }
-
-  dump(envFile?: string): string {
-    return Array.from(this.env.entries())
-      .map((key, value) => `${key}="${value}"`)
-      .join("\n");
-  }
+export interface TemplateEnv {
+  get(name: string): string | undefined;
+  set(name: string, value: string): void;
 }
 
 export interface BaseTemplate {
@@ -130,7 +141,7 @@ export interface BaseTemplate {
   name: string;
 
   /** The runtimes that can be used with this template */
-  runtimes: TemplateRuntime[];
+  runtimes?: TemplateRuntime[];
 
   /** The options that can be used with this template */
   options: TemplateOptions[];
@@ -140,6 +151,12 @@ export interface BaseTemplate {
     packageManager?: TemplatePackageManager;
     git?: boolean;
   };
+
+  /**
+   * Create a new package.json upon initializing project?
+   * @default false
+   */
+  initPkg?: boolean;
 
   /**
    * The beforeCreate command for this template
@@ -177,7 +194,10 @@ export interface BaseTemplate {
   /** The create command for this template */
   create: (app: TemplateBuiltContext<this["options"]>) => Promise<void> | void;
 
-  /** Whether to automatically install dependencies after creating this template */
+  /** Whether to automatically install dependencies after creating this template.
+   *
+   * If this option is not passed, a prompt will query the user to do so
+   */
   autoInstallDeps?: boolean;
 }
 

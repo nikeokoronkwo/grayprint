@@ -2,7 +2,8 @@ import { defineCoreTool } from "./base.ts";
 
 export default defineCoreTool({
   name: "sass",
+  version: "latest",
   init(context) {
-    context.installSync("sass", { dev: true });
+    context.packages.add(["sass"], { dev: true });
   },
 });
