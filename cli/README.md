@@ -1,4 +1,10 @@
-# Gr
+# Grayprint CLI
+
+The GrayPrint CLI (i.e `create-grayprint`).
+
+If you want to create and publish grayprint templates, see
+[@grayprint/create](../packages/create).
+
 
 ## Using the CLI
 
