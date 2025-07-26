@@ -1,6 +1,6 @@
 {
-    "imports": {
-        "@grayprint/create": "../packages/create/mod.ts",
-        "@grayprint/create/": "../packages/create/"
-    }
+  "imports": {
+    "@grayprint/create": "../packages/create/mod.ts",
+    "@grayprint/create/": "../packages/create/"
+  }
 }

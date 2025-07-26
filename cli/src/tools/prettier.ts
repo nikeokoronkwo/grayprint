@@ -22,8 +22,11 @@ export default defineCoreTool<PrettierOptions>({
     }
 
     if (context.options.tailwind) {
-      context.packages.add(['prettier-plugin-tailwindcss'], { dev: true });
-      context.writeFile(".prettierrc", `{"plugins": ["prettier-plugin-tailwindcss"]}`);
+      context.packages.add(["prettier-plugin-tailwindcss"], { dev: true });
+      context.writeFile(
+        ".prettierrc",
+        `{"plugins": ["prettier-plugin-tailwindcss"]}`,
+      );
     } else {
       context.writeFile(".prettierrc", "{}");
     }

@@ -2,16 +2,16 @@
 import prompt from "npm:prompts";
 import {
   BaseTemplate,
+  BaseTool,
+  BaseToolOptions,
   DotEnvOptions,
   TemplateBuiltContext,
   TemplateConfig,
   TemplateContext,
   TemplateEnv,
   TemplateOptions,
-  BaseToolOptions,
+  TemplatePaths,
   TemplateToolContext,
-  BaseTool,
-  TemplatePaths
 } from "@grayprint/core";
 import { optionToPrompt } from "./template/questionnaire.ts";
 import { Runtime } from "./template/runtimes.ts";
@@ -102,7 +102,7 @@ class TemplateContextImpl<T extends BaseTemplate>
 
 class TemplateBuiltContextImpl<T extends BaseTemplate>
   extends TemplateContextImpl<T>
-  implements TemplateBuiltContext<T['options']> {
+  implements TemplateBuiltContext<T["options"]> {
   private _templateDir: string;
   private _outputDir: string;
   private dotEnvContext: Record<string, Map<string, string>> = {};
@@ -147,11 +147,10 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
     this._typescript = options.typescript;
     this._git = options.git;
     this.path = {
-      ROOT: outDir
-    }
+      ROOT: outDir,
+    };
   }
   path: TemplatePaths;
-  
 
   dotEnv(key: string, options?: DotEnvOptions): string | undefined;
   dotEnv(key: string, value?: string, options?: DotEnvOptions): string;
@@ -260,26 +259,27 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
   }
 
   async run(...args: string[]): Promise<void> {
-    await (new Deno.Command(args[0], { args: args.slice(1) }).output())
+    await (new Deno.Command(args[0], { args: args.slice(1) }).output());
   }
   runSync(...args: string[]): void {
-    (new Deno.Command(args[0], { args: args.slice(1) }).outputSync())
+    new Deno.Command(args[0], { args: args.slice(1) }).outputSync();
   }
   createDir(dir: string): void {
     return Deno.mkdirSync(
-      isAbsolute(dir) ? dir :  join(this._outputDir, dir)
+      isAbsolute(dir) ? dir : join(this._outputDir, dir),
     );
   }
   createFile(file: string, contents?: string): void {
     Deno.createSync(
-      isAbsolute(file) ? file : join(this._outputDir, file)
+      isAbsolute(file) ? file : join(this._outputDir, file),
     )
       .writeSync(new TextEncoder().encode(contents));
   }
   writeFile(file: string, contents: string): void {
     Deno.writeTextFileSync(
-      isAbsolute(file) ? file : join(this._outputDir, file), 
-    contents);
+      isAbsolute(file) ? file : join(this._outputDir, file),
+      contents,
+    );
   }
   async readFile(file: string): Promise<string> {
     return await Deno.readTextFile(join(this._outputDir, file));
@@ -295,23 +295,26 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
   }
   fileExists(file: string): boolean {
     return existsSync(
-      isAbsolute(file) ? file : join(this._outputDir, file)
-    )
+      isAbsolute(file) ? file : join(this._outputDir, file),
+    );
   }
   addScript(name: string, cmd: string) {
     this.packageJsonRecord[name] = cmd;
   }
 
   transformConfig(file: string, addedConfig: object) {
-    throw new Error("Unsupported Command!")
-  };
+    throw new Error("Unsupported Command!");
+  }
 
   // ======= others ======
 
   dumpDotEnv(): Array<[string, string]> {
     return Object.entries(this.dotEnvContext).map(([file, map]) => {
-      return [file, Array.from(map.entries()).map(([k, v]) => `${k}=${v}`).join('\n')]
-    })
+      return [
+        file,
+        Array.from(map.entries()).map(([k, v]) => `${k}=${v}`).join("\n"),
+      ];
+    });
   }
 }
 

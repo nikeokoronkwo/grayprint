@@ -46,14 +46,13 @@ export class ParsedTemplate {
   /** Gets the configuration associated with this
    */
   async config(defaultConfig?: BaseTemplate) {
-
     // TODO: In the future we will support layers
     try {
       const { config, configFile } = await loadConfig<BaseTemplate>({
         cwd: this.path,
         configFile: this.configFile?.replace(extname(this.configFile), ""),
         defaults: defaultConfig,
-        name: 'grayprint'
+        name: "grayprint",
       });
 
       return { config, file: configFile };

@@ -1,4 +1,7 @@
-import { TemplateOptions, Option as TemplateChoiceOption } from "@grayprint/core";
+import {
+  Option as TemplateChoiceOption,
+  TemplateOptions,
+} from "@grayprint/core";
 // @deno-types="npm:@types/prompts@2.4.9"
 import { PromptObject } from "npm:prompts@2.4.2";
 import { InvalidOptionError } from "../errors/invalidOptionError.ts";
@@ -31,15 +34,17 @@ export function optionToPrompt(
         type: "multiselect",
         name: option.name,
         message: option.question,
-        choices: option.options.map((m: string | TemplateChoiceOption) => 
-          (typeof m === 'string' ? { title: m } : m)),
+        choices: option.options.map((
+          m: string | TemplateChoiceOption,
+        ) => (typeof m === "string" ? { title: m } : m)),
       }
       : {
         type: "select",
         name: option.name,
         message: option.question,
-        choices: option.options.map((m: string | TemplateChoiceOption) => 
-          (typeof m === 'string' ? { title: m } : m)),
+        choices: option.options.map((
+          m: string | TemplateChoiceOption,
+        ) => (typeof m === "string" ? { title: m } : m)),
       };
   } else {
     return "validate" in option

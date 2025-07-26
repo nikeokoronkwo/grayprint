@@ -78,7 +78,7 @@ async function processConfig(
   let runtime: Runtime;
   let packageManager: PackageManager;
 
-  const specifiedRuntimes = template.runtimes ?? ['deno', 'node', 'bun'];
+  const specifiedRuntimes = template.runtimes ?? ["deno", "node", "bun"];
   const availableRuntimes = await availableRuntimesPromise;
   const matchedRuntimes = specifiedRuntimes.filter((r) =>
     availableRuntimes.includes(r)
@@ -145,7 +145,7 @@ async function processConfig(
   });
 
   const initPkg = template.initPkg ?? false;
-  
+
   if (initPkg) {
     builtContext.init();
   }
@@ -164,41 +164,58 @@ async function processConfig(
   for (const [file, contents] of dotEnv) {
     Deno.writeTextFileSync(
       join(outputDir, file),
-      contents
+      contents,
     );
   }
 
   // 7.3 set up ts if not already
 
   // 7.4 set up git if not already
-  if (!(await exists(
-    join(outputDir, '.git')
-  )) && builtContext.git) {
-    const { code, stderr } = await (new Deno.Command('git', { args: ['init'] })).output();
+  if (
+    !(await exists(
+      join(outputDir, ".git"),
+    )) && builtContext.git
+  ) {
+    const { code, stderr } = await (new Deno.Command("git", { args: ["init"] }))
+      .output();
     if (code !== 0) throw new Error(`Failed to initialize git: ${stderr}`);
   }
 
   // 7.5 update package.json if any
   let configFile;
   let configFromConfigFile = {};
-  if (await exists(join(outputDir, 'package.json'))) {
-    configFromConfigFile = JSON.parse(await Deno.readTextFile(join(outputDir, 'package.json')));
-    await Deno.writeTextFile(join(outputDir, 'package.json'), JSON.stringify(deepMerge(configFromConfigFile, builtContext.packageJsonRecord)))
-  } else if (await exists(join(outputDir, 'deno.json'))) {
-    configFromConfigFile = JSON.parse(await Deno.readTextFile(join(outputDir, 'deno.json')));
-    await Deno.writeTextFile(join(outputDir, 'deno.json'), JSON.stringify(deepMerge(configFromConfigFile, builtContext.packageJsonRecord)))
+  if (await exists(join(outputDir, "package.json"))) {
+    configFromConfigFile = JSON.parse(
+      await Deno.readTextFile(join(outputDir, "package.json")),
+    );
+    await Deno.writeTextFile(
+      join(outputDir, "package.json"),
+      JSON.stringify(
+        deepMerge(configFromConfigFile, builtContext.packageJsonRecord),
+      ),
+    );
+  } else if (await exists(join(outputDir, "deno.json"))) {
+    configFromConfigFile = JSON.parse(
+      await Deno.readTextFile(join(outputDir, "deno.json")),
+    );
+    await Deno.writeTextFile(
+      join(outputDir, "deno.json"),
+      JSON.stringify(
+        deepMerge(configFromConfigFile, builtContext.packageJsonRecord),
+      ),
+    );
   }
-  
+
   // 8. auto install deps if defined, else ask
-  if (!(await exists('node_modules'))) {
+  if (!(await exists("node_modules"))) {
     if (template.autoInstallDeps) {
       await builtContext.packages.install();
     } else if (template.autoInstallDeps === undefined) {
       const shouldInstall = await prompt([{
-        name: 'install_deps',
-        type: 'confirm',
+        name: "install_deps",
+        type: "confirm",
         message: "Should we install dependencies for you",
-      }])
+      }]);
 
       if (shouldInstall.install_deps) {
         await builtContext.packages.install();

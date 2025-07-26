@@ -195,7 +195,7 @@ export interface BaseTemplate {
   create: (app: TemplateBuiltContext<this["options"]>) => Promise<void> | void;
 
   /** Whether to automatically install dependencies after creating this template.
-   * 
+   *
    * If this option is not passed, a prompt will query the user to do so
    */
   autoInstallDeps?: boolean;
