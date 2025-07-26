@@ -1,6 +1,6 @@
 name: CI Bump Workspace Versions
 
-on: 
+on:
   workflow_dispatch
 
 jobs:

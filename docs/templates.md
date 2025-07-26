@@ -81,7 +81,7 @@ environment variables, as well as for creating `.env` files in the project, and
 For more information on the `defineTemplate` function,
 [check out the docs on JSR]().
 
-### Example 1:
+### Example
 
 This example is used to copy a `template` directory from the current directory
 of the template config file to the user's directory where his/her project is
@@ -122,15 +122,20 @@ export default defineTemplate({
 
     // run code before
     beforeCreate: (config) => {
+        let angular: boolean = false;
+
         if (config['react']) {
 
             // can ask more questions in case more info is needed
             // automatically added to config afterwards
-            const angular = app.question({
+            angular = app.question({
                 statement: `Should We Use Angular?`,
                 type: 'boolean'
             });
         }
+
+        // return options to be added
+        return { angular }
     },
     // add tools to install as well
     tools: []
@@ -140,11 +145,13 @@ export default defineTemplate({
         // copy directories
         app.copyDir('template', '.');
 
-        // add environment variables
-        app.env('FOO', 'bar', {
+        // add vars to dot env
+        app.dotEnv('FOO', 'bar', {
             // dev - '.env.dev', prod - '.env.prod' and so on
             type: 'dev'
         });
+
+        const env = app.env.get('MY_ENV_VAR')
 
         // use tools
         // you can use this for programmatic operations of tools
@@ -164,6 +171,9 @@ export default defineTemplate({
         await app.run(app.commands.install);
         await app.run(app.commands.add('prettier'));
         await app.run(app.packageManager, ['status']);
+
+        // use options from `beforeCreate`
+
     }
 })
 ```

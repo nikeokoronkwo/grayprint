@@ -1,17 +1,16 @@
-import { TemplateOptions } from "@grayprint/core";
+import { TemplateOptions, Option as TemplateChoiceOption } from "@grayprint/core";
 // @deno-types="npm:@types/prompts@2.4.9"
 import { PromptObject } from "npm:prompts@2.4.2";
 import { InvalidOptionError } from "../errors/invalidOptionError.ts";
 
 /**
- * @todo Add more question options:
+ * Add more question options:
  * - Format
  * - Hints
  * - Title and description in options
  */
 export function optionToPrompt(
   option: TemplateOptions,
-  options: TemplateOptions[],
 ): PromptObject {
   if (option.type === "boolean") {
     return {
@@ -20,11 +19,11 @@ export function optionToPrompt(
       message: option.question,
       initial: option.default,
     };
-  } else if (option.type === "list" || "options" in option) {
+  } else if ("options" in option) {
     if (typeof option.options === "function") {
       throw new InvalidOptionError(
         "Options as functions are not implemented yet. File an issue",
-        option
+        option,
       );
     }
     return option.multiple
@@ -32,13 +31,15 @@ export function optionToPrompt(
         type: "multiselect",
         name: option.name,
         message: option.question,
-        choices: option.options.map((m) => ({ title: m })),
+        choices: option.options.map((m: string | TemplateChoiceOption) => 
+          (typeof m === 'string' ? { title: m } : m)),
       }
       : {
         type: "select",
         name: option.name,
         message: option.question,
-        choices: option.options.map((m) => ({ title: m })),
+        choices: option.options.map((m: string | TemplateChoiceOption) => 
+          (typeof m === 'string' ? { title: m } : m)),
       };
   } else {
     return "validate" in option

@@ -1,8 +1,10 @@
 import { BaseTool, BaseToolOptions } from "./tools.ts";
 
 export interface PrettierOptions extends BaseToolOptions {
-  /** Whether prettier is available */
+  /** Whether eslint is available */
   eslint: boolean;
+  /** Whether tailwind is available */
+  tailwind: boolean;
 }
 
 export interface ESLintOptions extends BaseToolOptions {
@@ -11,15 +13,14 @@ export interface ESLintOptions extends BaseToolOptions {
   typescript?: boolean;
   server?: boolean;
   browser?: boolean;
+  config?: string;
 }
 
 export interface TailwindOptions extends BaseToolOptions {
-  framework?: string;
+  vite?: boolean;
   typescript?: boolean;
-  noFramework?: {
-    cssFile?: string;
-    srcDir?: string;
-  };
+  postcss?: boolean;
+  cssFile?: string;
 }
 
 export type TailwindTool = BaseTool<TailwindOptions>;

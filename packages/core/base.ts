@@ -1,8 +1,10 @@
-export type DefaultValue<T extends TemplateOptions> = T["type"] extends "string"
-  ? string
-  : T["type"] extends "boolean" ? boolean
-  : T["type"] extends "list" ? string[]
-  : (string | boolean | string[]);
+import { TemplatePackageManager, TemplateRuntime } from "./tools.ts";
+
+type DefaultValue<T extends TemplateOptions> = T extends
+  StringTemplateOptions<any, any> ? string
+  : T extends BooleanTemplateOptions<any, any> ? boolean
+  : T extends ListTemplateOptions<any, any> ? string[]
+  : never;
 
 /**
  * An object containing the values passed from `options` after prompting them to the user.
@@ -13,7 +15,7 @@ export type DefaultValue<T extends TemplateOptions> = T["type"] extends "string"
  *
  * For instance: the following list of prompts (from {@link commonQuestions})
  * ```ts
-name: {
+  name: {
     name: "name",
     question: "What is the name of your project?",
     validate: (v) => {
@@ -50,9 +52,15 @@ name: {
  *
  * Result types can either be of type `string`, `boolean` or `string[]` (i.e `Array<string>`)
  */
-export type TemplateConfig<T extends TemplateOptions[]> = {
+export type TemplateConfig<
+  T extends readonly TemplateOptions[] = TemplateOptions[],
+> = {
   [K in T[number] as K["name"]]: DefaultValue<K> | undefined;
 };
+
+type ExtractTemplateConfigValue<Name extends string> = Name extends
+  keyof TemplateConfig<infer U> ? TemplateConfig<U>[Name]
+  : never;
 
 /**
  * The different option types that can be used for a template option
@@ -68,13 +76,17 @@ type TemplateOptionType = "string" | "boolean" | "list";
 /**
  * Base implementation of template options
  */
-interface BaseTemplateOptions<T extends TemplateOptionType> {
+interface BaseTemplateOptions<
+  T extends TemplateOptionType,
+  Name extends string,
+  DependsOn extends string | undefined = undefined,
+> {
   /**
    * The name of the given template option
    *
    * Used to access the value returned by the user in the {@link TemplateContext.config} object
    */
-  name: string;
+  name: Name;
 
   /**
    * The question to ask the user, which will prompt the user for the given information
@@ -86,8 +98,11 @@ interface BaseTemplateOptions<T extends TemplateOptionType> {
    */
   type?: T;
 
-  dependsOn?: string;
-  dependsIf?: (v: string | boolean | string[]) => boolean;
+  dependsOn?: DependsOn;
+  dependsIf?: (
+    v: DependsOn extends string ? ExtractTemplateConfigValue<DependsOn>
+      : never,
+  ) => boolean;
 
   /**
    * Whether the option is a secure option, like a password
@@ -96,19 +111,34 @@ interface BaseTemplateOptions<T extends TemplateOptionType> {
   secure?: boolean;
 }
 
-export interface StringTemplateOptions extends BaseTemplateOptions<"string"> {
+export interface StringTemplateOptions<
+  Name extends string,
+  Depends extends string | undefined = undefined,
+> extends BaseTemplateOptions<"string", Name, Depends> {
   /** A function that can be used to check whether a given value is correct or not */
   validate?: (value: string) => string | boolean;
 
   /** A default value for the given option */
   default?: string;
 }
-export interface BooleanTemplateOptions extends BaseTemplateOptions<"boolean"> {
+export interface BooleanTemplateOptions<
+  Name extends string,
+  Depends extends string | undefined = undefined,
+> extends BaseTemplateOptions<"boolean", Name, Depends> {
   /** A default value for the given option */
   default?: boolean;
 }
-export interface ListTemplateOptions<T extends string = string>
-  extends BaseTemplateOptions<"list"> {
+
+export interface Option {
+  title: string;
+  description?: string;
+}
+
+export interface ListTemplateOptions<
+  Name extends string,
+  Depends extends string | undefined = undefined,
+  T extends string | Option = string,
+> extends BaseTemplateOptions<"list", Name, Depends> {
   /**
    * The options that the user is to choose from when prompted by the template
    * @todo Implement functionality for handling a function type for this alongside {@link BaseTemplateOptions.dependsOn}
@@ -122,7 +152,7 @@ export interface ListTemplateOptions<T extends string = string>
   multiple?: boolean;
 }
 /**
- * # Template Options
+ * ## Template Options
  * Template options are objects used to denote queries/questions that are run by grayprint to receive user input from the command line.
  *
  * This can be used for configuring your templates with user-defined information.
@@ -138,18 +168,18 @@ export interface ListTemplateOptions<T extends string = string>
  *
  * By default, all options are assumed to be {@link StringTemplateOptions} (unless an `options` field is specified, which makes it a {@link ListTemplateOptions})
  */
-
 export type TemplateOptions =
-  | StringTemplateOptions
-  | BooleanTemplateOptions
-  | ListTemplateOptions;
+  | StringTemplateOptions<string, any>
+  | BooleanTemplateOptions<string, any>
+  | ListTemplateOptions<string, any, string>
+  | ListTemplateOptions<string, any, Option>;
 
 /** Common questions that users can use as {@link TemplateOptions} in projects */
 export const commonQuestions: {
   name: TemplateOptions;
-  platform: TemplateOptions;
+  // platform: TemplateOptions;
   typescript: TemplateOptions;
-  packageManager: TemplateOptions;
+  // packageManager: TemplateOptions;
   git: TemplateOptions;
 } = {
   /** This template option prompts the user for the name of the project */
@@ -164,13 +194,13 @@ export const commonQuestions: {
       } else return true;
     },
   },
-  /** This template option prompts the user for the runtime they are using */
-  platform: {
-    name: "platform",
-    question: "What platform are you designing for?",
-    type: "list",
-    options: ["node", "deno", "bun"],
-  },
+  // /** This template option prompts the user for the runtime they are using */
+  // platform: {
+  //   name: "platform",
+  //   question: "What platform are you designing for?",
+  //   type: "list",
+  //   options: ["node", "deno", "bun"],
+  // },
   /** This template option prompts the user for whether they want to use typescript */
   typescript: {
     name: "typescript",
@@ -178,14 +208,14 @@ export const commonQuestions: {
     type: "boolean",
     default: true,
   },
-  /** This template option prompts the user for which package manager they want to use */
-  packageManager: {
-    name: "packageManager",
-    question: "What package manager do you want to use?",
-    type: "list",
-    dependsOn: "platform",
-    options: ["npm", "pnpm", "yarn", "bun", "deno"],
-  },
+  // /** This template option prompts the user for which package manager they want to use */
+  // packageManager: {
+  //   name: "packageManager",
+  //   question: "What package manager do you want to use?",
+  //   type: "list",
+  //   dependsOn: "platform",
+  //   options: ["npm", "pnpm", "yarn", "bun", "deno"],
+  // },
   /** This template option prompts the user for whether they want to use git */
   git: {
     name: "git",
@@ -217,11 +247,18 @@ export interface TemplateContext<T extends TemplateOptions[] = []> {
    */
   config: TemplateConfig<T>;
 
+  runtime: TemplateRuntime;
+
+  /**
+   * In the future, we may have a `packageManager` interface for directly adding packages
+   */
+  packageManager: TemplatePackageManager;
+
   /** Run a cli question for the given option
    * @param {TemplateOptions} q The question, as a {@link TemplateOptions} object
-   * @returns {PromiseLike<string | boolean | string[]>} The direct value from the question
+   * @returns {Promise<string | boolean | string[]>} The direct value from the question
    */
-  question: (q: TemplateOptions) => PromiseLike<string | boolean | string[]>;
+  question: (q: TemplateOptions) => Promise<string | boolean | string[]>;
 
   /**
    * Custom logger for logging messages out
@@ -263,15 +300,7 @@ export interface TemplateContext<T extends TemplateOptions[] = []> {
  * It mainly contains functions for installing tools and running commands on the user's project root
  */
 
-export interface BuiltContext {
-  install: (tool: string, options?: {
-    dev?: boolean;
-    exact?: boolean;
-  }) => Promise<void>;
-  installSync: (tool: string, options?: {
-    dev?: boolean;
-    exact?: boolean;
-  }) => void;
+export interface IOInterfaceMixin {
   run: (...args: string[]) => Promise<void>;
   runSync: (...args: string[]) => void;
   createDir: (dir: string) => void;
@@ -279,6 +308,7 @@ export interface BuiltContext {
   writeFile: (file: string, contents: string) => void;
   readFile: (file: string) => Promise<string>;
   readFileSync: (file: string) => string;
+  fileExists: (file: string) => boolean;
   addScript: (name: string, cmd: string) => void;
 
   /** Changes the working directory for future commands */
@@ -305,4 +335,27 @@ export interface BuiltContext {
    * @returns {void}
    */
   transformConfig: (file: string, addedConfig: object) => void;
+}
+
+export interface TemplatePackageOptions {
+  dev?: boolean;
+  exact?: boolean;
+}
+
+/**
+ * An object used to encapsulate important calls for commands for a given package manager
+ */
+export interface TemplatePackageInterface {
+  name: TemplatePackageManager;
+  add(pkgs: string[], options?: TemplatePackageOptions): Promise<boolean>;
+  remove(pkgs: string[]): Promise<boolean>;
+  install(): Promise<boolean>;
+  run(command: string, ...args: string[]): Promise<boolean>;
+  /**
+   * @param pkg The package to execute. Note to add the `npm:` specifier if using Deno for NPM
+   * @param args The arguments to pass when executing the package
+   */
+  exec(pkg: string, ...args: string[]): Promise<boolean>;
+  create(pkg: string, ...args: string[]): Promise<boolean>;
+  cmd(args: string[], options?: { exec?: boolean }): Promise<boolean>;
 }
