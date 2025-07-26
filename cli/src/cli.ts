@@ -1,11 +1,10 @@
 import { GithubAPI, GithubClient } from "./api/github.ts";
 import { Buffer } from "jsr:@std/streams";
 import { UntarStream } from "jsr:@std/tar";
-import { chunk } from "jsr:@std/collections";
 import { dirname, extname, join, normalize, relative } from "jsr:@std/path";
 import { NPMAPI, NPMClient } from "./api/npm.ts";
 import { move } from "jsr:@std/fs";
-import { loadConfig, loadDotenv } from "npm:c12";
+import { loadConfig } from "npm:c12";
 import { BaseTemplate } from "@grayprint/core";
 import { GrayPrintClient } from "./api/client.ts";
 import { TemplateIdVersionResponse } from "./api/models.ts";
@@ -46,7 +45,7 @@ export class ParsedTemplate {
   /** Gets the configuration associated with this
    */
   async config(defaultConfig?: BaseTemplate) {
-    // TODO: In the future we will support layers
+    // TODO(nikeokoronkwo): In the future we will support layers
     try {
       const { config, configFile } = await loadConfig<BaseTemplate>({
         cwd: this.path,
@@ -137,7 +136,6 @@ async function getGithubTemplate(
   const client: GithubAPI = new GithubClient();
 
   const arrayBuffer = await client.getRepo(user, repo, options?.ref);
-  const data = new Buffer(arrayBuffer);
 
   /** @todo fix tarball processing/transform */
   return await getTemplateFromArchive(
@@ -163,15 +161,15 @@ async function getNPMTemplate(
 
   let archiveUrl;
   if (options?.version) {
-    let pkgWithVersion = await client.getPackageWithVersion(
+    const pkgWithVersion = await client.getPackageWithVersion(
       scopedName,
       options.version,
     );
     archiveUrl = pkgWithVersion.dist.tarball;
   } else {
-    let pkg = await client.getPackage(scopedName);
-    let latestVer = pkg["dist-tags"].latest;
-    let pkgWithVersion = pkg.versions[latestVer];
+    const pkg = await client.getPackage(scopedName);
+    const latestVer = pkg["dist-tags"].latest;
+    const pkgWithVersion = pkg.versions[latestVer];
 
     archiveUrl = pkgWithVersion.dist.tarball;
   }

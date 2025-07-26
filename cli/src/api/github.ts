@@ -1,4 +1,4 @@
-import { App, Octokit } from "npm:octokit";
+import { Octokit } from "npm:octokit";
 
 export interface GithubAPI {
   getRepo(user: string, repo: string, ref?: string): Promise<ArrayBuffer>;
@@ -14,7 +14,7 @@ export class GithubClient implements GithubAPI {
   }
 
   async getRepo(user: string, repo: string, ref?: string) {
-    const { data, status } = await this.octokit.rest.repos
+    const { data } = await this.octokit.rest.repos
       .downloadTarballArchive({
         owner: user,
         repo,

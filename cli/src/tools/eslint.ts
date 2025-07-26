@@ -8,8 +8,8 @@ export default defineCoreTool<ESLintOptions>({
   init(context) {
     try {
       const c = context.readFileSync("eslint.config.js");
-      return;
-    } catch (error) {
+      if (c.length !== 0) return;
+    } catch (_) {
       // eslint not exists
     }
 

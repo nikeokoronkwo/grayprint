@@ -19,7 +19,7 @@ export async function runTemplate(template: ParsedTemplate, dir: string) {
     // unpack by default
     name: "unpack",
     options: [],
-    create: async (context) => {
+    create: async (_) => {
       await template.unpack(dir);
     },
   });
@@ -68,7 +68,7 @@ async function processConfig(
   }
 
   const optResults = await prompt(optionPrompts);
-  let config: TemplateConfig<typeof template.options> = {};
+  const config: TemplateConfig<typeof template.options> = {};
   for (const [key, value] of Object.entries(optResults)) {
     config[key] = getValue(key, value, options);
   }
@@ -151,7 +151,7 @@ async function processConfig(
   }
 
   // 7. run create
-  const result = await template.create(builtContext);
+  await template.create(builtContext);
 
   // 7.1 set up tools
   const tools = template.tools ?? [];
@@ -182,7 +182,6 @@ async function processConfig(
   }
 
   // 7.5 update package.json if any
-  let configFile;
   let configFromConfigFile = {};
   if (await exists(join(outputDir, "package.json"))) {
     configFromConfigFile = JSON.parse(

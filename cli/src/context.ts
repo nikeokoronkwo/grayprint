@@ -53,6 +53,7 @@ class TemplateContextImpl<T extends BaseTemplate>
 
   runtime: Runtime;
 
+  //deno-lint-ignore no-explicit-any
   configFile: Record<string, any> = {};
 
   cwd?: string;
@@ -86,6 +87,7 @@ class TemplateContextImpl<T extends BaseTemplate>
   error = console.error;
 
   upgradeContext(dir: string, options: {
+    //deno-lint-ignore no-explicit-any
     beforeCreateCtx: Record<string, any>;
     outputDir?: string;
     typescript?: boolean;
@@ -113,6 +115,7 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
 
   env: TemplateEnv = new TemplateEnvImpl();
 
+  //deno-lint-ignore no-explicit-any
   ctx: Record<string, any>;
 
   get typescript(): boolean {
@@ -131,6 +134,7 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
   constructor(impl: TemplateContextImpl<T>, options: {
     template: T;
     dir: string;
+    //deno-lint-ignore no-explicit-any
     beforeCreateCtx: Record<string, any>;
     outputDir?: string;
     typescript?: boolean;
@@ -302,7 +306,7 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
     this.packageJsonRecord[name] = cmd;
   }
 
-  transformConfig(file: string, addedConfig: object) {
+  transformConfig(_file: string, _addedConfig: object) {
     throw new Error("Unsupported Command!");
   }
 

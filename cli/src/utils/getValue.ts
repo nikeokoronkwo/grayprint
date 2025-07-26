@@ -1,15 +1,22 @@
+//deno-lint-ignore-file no-explicit-any
 import { ListTemplateOptions, TemplateOptions } from "@grayprint/core";
 
 export function getValue(key: string, value: any, opts: TemplateOptions[]) {
   if (typeof value === "number") {
     // index
-    const option = opts.find((v) => v.name === key) as ListTemplateOptions;
+    const option = opts.find((v) => v.name === key) as ListTemplateOptions<
+      string,
+      any
+    >;
     return typeof option.options === "function"
       ? /* unimplemented */ []
       : option.options[value];
   } else if (Array.isArray(value)) {
     // array of numbers
-    const option = opts.find((v) => v.name === key) as ListTemplateOptions;
+    const option = opts.find((v) => v.name === key) as ListTemplateOptions<
+      string,
+      any
+    >;
     return typeof option.options === "function"
       ? /* unimplemented */ []
       : option.options.filter((_, i) => value.includes(i));

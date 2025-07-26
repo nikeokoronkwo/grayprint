@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { TemplatePackageManager, TemplateRuntime } from "./tools.ts";
 
 type DefaultValue<T extends TemplateOptions> = T extends
@@ -265,7 +266,6 @@ export interface TemplateContext<T extends TemplateOptions[] = []> {
    * @param msg The message to log out
    * @returns {void}
    */
-  // deno-lint-ignore no-explicit-any
   log: (msg: any) => void;
 
   /**
@@ -275,7 +275,6 @@ export interface TemplateContext<T extends TemplateOptions[] = []> {
    * @param msg The message to log out
    * @returns {void}
    */
-  //deno-lint-ignore no-explicit-any
   error: (msg: any) => void;
 
   /**
@@ -290,7 +289,6 @@ export interface TemplateContext<T extends TemplateOptions[] = []> {
    *
    * The changes are reflected at the end of the `create` function
    */
-  //deno-lint-ignore no-explicit-any
   configFile: Record<string, any>;
 }
 
