@@ -13,35 +13,34 @@ export default defineCoreTool<ESLintOptions>({
       // eslint not exists
     }
 
-    if (context.options.config) {
+    if (context.options?.config) {
       context.packages.create(
         "@eslint/config@latest",
         "--config",
-        context.options.config,
+        context.options?.config,
       );
       return;
     }
 
-    context.installSync("eslint", { dev: true });
-    context.installSync("@eslint/js", { dev: true });
+    context.packages.add(["eslint", "@eslint/js"], { dev: true });
 
     const configChunks = [`import pluginJs from "@eslint/js";`];
 
     if (context.options?.server || context.options?.browser) {
-      context.installSync("globals", { dev: true });
+      context.packages.add(["globals"], { dev: true });
       configChunks.push(`import globals from "globals";`);
     }
 
     if (context.options?.react) {
-      context.installSync("eslint-plugin-react", { dev: true });
+      context.packages.add(["eslint-plugin-react"], { dev: true });
       configChunks.push(`import pluginReact from "eslint-plugin-react";`);
     } else if (context.options?.vue) {
-      context.installSync("eslint-plugin-vue", { dev: true });
+      context.packages.add(["eslint-plugin-vue"], { dev: true });
       configChunks.push(`import pluginVue from "eslint-plugin-vue";`);
     }
 
     if (context.options?.typescript) {
-      context.installSync("typescript-eslint", { dev: true });
+      context.packages.add(["typescript-eslint"], { dev: true });
       configChunks.push(`import tseslint from "typescript-eslint";`);
     }
 

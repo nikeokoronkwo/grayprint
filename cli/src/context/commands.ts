@@ -3,21 +3,23 @@ import {
   TemplatePackageOptions,
 } from "@grayprint/core";
 import { PackageManager } from "./package_manager.ts";
+import { spawnSync } from "node:child_process";
 
 export function getCommandsForPackageManager(
   packageManager: PackageManager,
+  cwd: string
 ): TemplatePackageInterface {
   switch (packageManager) {
     case "deno":
-      return denoCommands;
+      return denoCommands(cwd);
     case "bun":
-      return bunCommands;
+      return bunCommands(cwd);
     case "npm":
-      return npmCommands;
+      return npmCommands(cwd);
     case "pnpm":
-      return pnpmCommands;
+      return pnpmCommands(cwd);
     case "yarn":
-      return yarnCommands;
+      return yarnCommands(cwd);
   }
 }
 
@@ -35,6 +37,8 @@ class TemplatePkgManagerInterface implements TemplatePackageInterface {
   devArg: string;
   exactArg: string;
 
+  cwd: string;
+
   constructor(options: {
     name: PackageManager;
     execName?: string;
@@ -48,6 +52,7 @@ class TemplatePkgManagerInterface implements TemplatePackageInterface {
       dev: string;
       exact: string;
     };
+    cwd?: string;
   }) {
     this.name = options.name;
     this.addArgs = options.add ?? options.install;
@@ -59,6 +64,7 @@ class TemplatePkgManagerInterface implements TemplatePackageInterface {
     this.runArgs = options.run;
     this.execName = options.execName;
     this.createArgs = options.create;
+    this.cwd = options.cwd ?? Deno.cwd();
   }
 
   async add(
@@ -67,8 +73,8 @@ class TemplatePkgManagerInterface implements TemplatePackageInterface {
   ): Promise<boolean> {
     const args = [...this.addArgs];
 
-    if (options.dev) args.push(this.devArg);
-    if (options.exact && (this.name !== "deno" && this.name !== "pnpm")) {
+    if (options?.dev) args.push(this.devArg);
+    if (options?.exact && (this.name !== "deno" && this.name !== "pnpm")) {
       args.push(this.exactArg);
     }
     if (this.name === "deno") args.push("--npm"); // assume deps are npm deps
@@ -95,7 +101,7 @@ class TemplatePkgManagerInterface implements TemplatePackageInterface {
   }
 
   async cmd(args: string[], options?: { exec?: boolean }): Promise<boolean> {
-    return await this._runCommand(args, options.exec);
+    return await this._runCommand(args, options?.exec);
   }
 
   async create(pkg: string, ...args: string[]): Promise<boolean> {
@@ -109,16 +115,16 @@ class TemplatePkgManagerInterface implements TemplatePackageInterface {
     return await this._runCommand(allArgs);
   }
 
-  private async _runCommand(args: string[], exec: boolean = false) {
-    const { code } = await new Deno.Command(exec ? this.execName : this.name, {
-      args,
-    }).output();
+  private _runCommand(args: string[], exec: boolean = false) {
+    return new Promise<boolean>((resolve) => {
+      const { status: code } = spawnSync(exec ? this.execName ?? this.name : this.name, args, { encoding: 'utf8', cwd: this.cwd });
 
-    return code === 0;
+      return resolve(code === 0);
+    })
   }
 }
 
-const denoCommands = new TemplatePkgManagerInterface({
+const denoCommands = (cwd: string) => new TemplatePkgManagerInterface({
   name: "deno",
   add: ["add"],
   remove: ["remove"],
@@ -130,9 +136,10 @@ const denoCommands = new TemplatePkgManagerInterface({
     dev: "-D",
     exact: "--exact", // no exact
   },
+  cwd
 });
 
-const npmCommands = new TemplatePkgManagerInterface({
+const npmCommands = (cwd: string) => new TemplatePkgManagerInterface({
   name: "npm",
   execName: "npx",
   remove: ["remove"],
@@ -143,9 +150,10 @@ const npmCommands = new TemplatePkgManagerInterface({
     dev: "--save-dev",
     exact: "--save-exact", // no exact
   },
+  cwd
 });
 
-const pnpmCommands = new TemplatePkgManagerInterface({
+const pnpmCommands = (cwd: string) => new TemplatePkgManagerInterface({
   name: "pnpm",
   execName: "pnpx",
   add: ["add"],
@@ -158,9 +166,10 @@ const pnpmCommands = new TemplatePkgManagerInterface({
     dev: "-D",
     exact: "--exact", // no exact
   },
+  cwd
 });
 
-const yarnCommands = new TemplatePkgManagerInterface({
+const yarnCommands = (cwd: string) => new TemplatePkgManagerInterface({
   name: "yarn",
   add: ["add"],
   remove: ["remove"],
@@ -172,9 +181,10 @@ const yarnCommands = new TemplatePkgManagerInterface({
     dev: "--dev",
     exact: "--exact", // no exact
   },
+  cwd
 });
 
-const bunCommands = new TemplatePkgManagerInterface({
+const bunCommands = (cwd: string) => new TemplatePkgManagerInterface({
   name: "bun",
   execName: "bunx",
   add: ["add"],
@@ -187,4 +197,5 @@ const bunCommands = new TemplatePkgManagerInterface({
     dev: "-d",
     exact: "-E", // no exact
   },
+  cwd
 });

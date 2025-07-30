@@ -49,8 +49,7 @@ Grayprint is also available as a binary that can be installed via
 
 ## Custom Template
 
-Making a custom template is simple. Your templates can be described with a
-`grayprint.yaml` file, or programmatically with a `grayprint.config.js` file.
+Making a custom template is simple. Your templates can be described with a `grayprint.config.js` file.
 Grayprint supports getting and using templates from the user's system (via
 path), Github (Public and Private Repositories), NPM, JSR, and direct URLs.
 

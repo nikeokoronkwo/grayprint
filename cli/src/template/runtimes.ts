@@ -1,9 +1,11 @@
+import { spawnSync } from "node:child_process";
+
 const runtimes = ["node", "deno", "bun"] as const;
 export type Runtime = (typeof runtimes)[number];
 export function checkAvailableRuntimes(): Promise<Runtime[]> {
   return Promise.all(
-    runtimes.map(async (r) => {
-      return (await (r === "deno"
+    runtimes.map((r) => {
+      return ((r === "deno"
           ? checkIfExecutableExists(Deno.execPath())
           : checkIfExecutableExists(r)))
         ? r
@@ -12,9 +14,9 @@ export function checkAvailableRuntimes(): Promise<Runtime[]> {
   ) as Promise<Runtime[]>;
 }
 
-async function checkIfExecutableExists(name: string): Promise<boolean> {
+function checkIfExecutableExists(name: string): boolean {
   try {
-    return (await new Deno.Command(name).output()).code === 0;
+    return (spawnSync(name, { encoding: 'utf8' })).status === 0;
   } catch (_) {
     return false;
   }

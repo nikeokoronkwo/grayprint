@@ -21,7 +21,7 @@ export default defineCoreTool<PrettierOptions>({
       context.packages.add(["eslint-prettier-config"], { dev: true });
     }
 
-    if (context.options.tailwind) {
+    if (context.options?.tailwind) {
       context.packages.add(["prettier-plugin-tailwindcss"], { dev: true });
       context.writeFile(
         ".prettierrc",

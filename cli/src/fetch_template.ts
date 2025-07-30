@@ -4,7 +4,7 @@ import { UntarStream } from "jsr:@std/tar";
 import { dirname, extname, join, normalize, relative } from "jsr:@std/path";
 import { NPMAPI, NPMClient } from "./api/npm.ts";
 import { move } from "jsr:@std/fs";
-import { loadConfig } from "npm:c12";
+import { loadConfig } from "npm:c12@^3.1.0";
 import { BaseTemplate } from "@grayprint/core";
 import { GrayPrintClient } from "./api/client.ts";
 import { TemplateIdVersionResponse } from "./api/models.ts";
