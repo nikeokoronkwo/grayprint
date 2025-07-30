@@ -14,7 +14,7 @@ export class NPMClient implements NPMAPI {
 
   async getPackage(name: string): Promise<NPMPackageResponse> {
     return await fetch(`${this.endpoint}/${name}`).then(async (result) => {
-      return await result.json();
+      return await result.json() as NPMPackageResponse;
     });
   }
 
@@ -24,7 +24,7 @@ export class NPMClient implements NPMAPI {
   ): Promise<NPMPackageVersionResponse> {
     return await fetch(`${this.endpoint}/${name}/${version}`).then(
       async (result) => {
-        return await result.json();
+        return await result.json() as NPMPackageVersionResponse;
       },
     );
   }

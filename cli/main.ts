@@ -1,5 +1,5 @@
 import { Args, parseArgs } from "jsr:@std/cli/parse-args";
-import { getParsedTemplate } from "./src/cli.ts";
+import { getParsedTemplate } from "./src/fetch_template.ts";
 import { runTemplate } from "./src/index.ts";
 
 type FlagType = "boolean" | "string" | "list";

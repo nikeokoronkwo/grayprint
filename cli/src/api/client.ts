@@ -24,12 +24,12 @@ export class GrayPrintClient implements GrayPrintAPI {
 
   async getTemplates(): Promise<TemplatesResponse> {
     return await fetch(`${this.endpoint}/api/templates`)
-      .then(async (r) => await r.json());
+      .then(async (r) => await r.json() as TemplatesResponse);
   }
 
   async getTemplateByKey(key: string): Promise<TemplateIdResponse> {
     return await fetch(`${this.endpoint}/api/templates/${key}`)
-      .then(async (r) => await r.json());
+      .then(async (r) => await r.json() as TemplateIdResponse);
   }
 
   async getTemplateByKeyAndVersion(
@@ -37,6 +37,6 @@ export class GrayPrintClient implements GrayPrintAPI {
     version: string,
   ): Promise<TemplateIdVersionResponse> {
     return await fetch(`${this.endpoint}/api/templates/${key}/${version}`)
-      .then(async (r) => await r.json());
+      .then(async (r) => await r.json() as TemplateIdVersionResponse);
   }
 }

@@ -6,8 +6,9 @@
     "./examples/*"
   ],
   "tasks": {
-    "dev": "deno run -A cli/main.ts",
-    "build:bin": "deno compile --output bin/grayprint -A cli/main.ts ",
+    "dev:cli": "deno run -A cli/main.ts",
+    "dev:create": "deno run -A packages/create/main.ts",
+    "build:bin": "deno compile --output bin/grayprint -A cli/main.ts",
     "build:npm": "deno run -A tools/npm.ts",
     "install": "deno install -A cli/main.ts",
     "test": "deno test -A",

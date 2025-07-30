@@ -2,8 +2,8 @@ import {
   Option as TemplateChoiceOption,
   TemplateOptions,
 } from "@grayprint/core";
-// @deno-types="npm:@types/prompts@2.4.9"
-import { PromptObject } from "npm:prompts@2.4.2";
+// @deno-types="npm:@types/prompts@^2.4.9"
+import { PromptObject } from "npm:prompts@^2.4.2";
 import { InvalidOptionError } from "../errors/invalidOptionError.ts";
 
 /**

@@ -1,7 +1,10 @@
 name: CI Bump Workspace Versions
 
 on:
-  workflow_dispatch
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
 
 jobs:
   bump:

@@ -1,4 +1,4 @@
-import { Octokit } from "npm:octokit";
+import { Octokit } from "npm:octokit@^5.0.0";
 
 export interface GithubAPI {
   getRepo(user: string, repo: string, ref?: string): Promise<ArrayBuffer>;

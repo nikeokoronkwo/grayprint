@@ -1,10 +1,10 @@
 import { BaseTemplate, TemplateConfig } from "@grayprint/core";
 import { InvalidOptionError } from "./errors/invalidOptionError.ts";
-import { ParsedTemplate } from "./cli.ts";
+import { ParsedTemplate } from "./fetch_template.ts";
 import { getValue } from "./utils/getValue.ts";
 import { red, yellow } from "jsr:@std/fmt/colors";
-// @deno-types="npm:@types/prompts@2.4.9"
-import prompt from "npm:prompts@2.4.2";
+// @deno-types="npm:@types/prompts@^2.4.9"
+import prompt from "npm:prompts@^2.4.2";
 import { optionToPrompt } from "./template/questionnaire.ts";
 import { uppercaseFirstLetter } from "./utils/uppercase.ts";
 import { checkAvailableRuntimes, Runtime } from "./template/runtimes.ts";
@@ -176,9 +176,7 @@ async function processConfig(
       join(outputDir, ".git"),
     )) && builtContext.git
   ) {
-    const { code, stderr } = await (new Deno.Command("git", { args: ["init"] }))
-      .output();
-    if (code !== 0) throw new Error(`Failed to initialize git: ${stderr}`);
+    builtContext.initGitSync();
   }
 
   // 7.5 update package.json if any

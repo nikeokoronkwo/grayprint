@@ -1,5 +1,5 @@
-// @deno-types="npm:@types/prompts"
-import prompt from "npm:prompts";
+// @deno-types="npm:@types/prompts@^2.4.9"
+import prompt from "npm:prompts@^2.4.2";
 import {
   BaseTemplate,
   BaseTool,
@@ -10,6 +10,7 @@ import {
   TemplateContext,
   TemplateEnv,
   TemplateOptions,
+  TemplatePackageInterface,
   TemplatePaths,
   TemplateToolContext,
 } from "@grayprint/core";
@@ -30,6 +31,7 @@ import prettier from "./tools/prettier.ts";
 import sass from "./tools/sass.ts";
 import eslint from "./tools/eslint.ts";
 import { isAbsolute, join } from "jsr:@std/path@^1.0.8";
+import { execFileSync } from "node:child_process";
 
 export function buildTemplatePreContext(template: BaseTemplate, options: {
   packageManager: PackageManager;
@@ -153,6 +155,7 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
     this.path = {
       ROOT: outDir,
     };
+    this.packages = getCommandsForPackageManager(this.packageManager, outDir);
   }
   path: TemplatePaths;
 
@@ -192,17 +195,24 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
     return copySync(from, dest);
   }
 
-  packages = getCommandsForPackageManager(this.packageManager);
+  packages: TemplatePackageInterface;
 
   async initGit(): Promise<void> {
     if (this.git) {
-      await new Deno.Command("git", { args: ["init"] }).output();
+      await new Promise((resolve) =>
+        resolve(
+          execFileSync("git", ["init"], {
+            encoding: "utf8",
+            cwd: this._outputDir,
+          }),
+        )
+      );
     }
   }
 
   initGitSync(): void {
     if (this.git) {
-      new Deno.Command("git", { args: ["init"] }).outputSync();
+      execFileSync("git", ["init"], { encoding: "utf8", cwd: this._outputDir });
     }
   }
 
@@ -263,10 +273,20 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
   }
 
   async run(...args: string[]): Promise<void> {
-    await (new Deno.Command(args[0], { args: args.slice(1) }).output());
+    await new Promise((resolve) =>
+      resolve(
+        execFileSync(args[0], args.slice(1), {
+          encoding: "utf8",
+          cwd: this._outputDir,
+        }),
+      )
+    );
   }
   runSync(...args: string[]): void {
-    new Deno.Command(args[0], { args: args.slice(1) }).outputSync();
+    execFileSync(args[0], args.slice(1), {
+      encoding: "utf8",
+      cwd: this._outputDir,
+    });
   }
   createDir(dir: string): void {
     return Deno.mkdirSync(
@@ -290,12 +310,14 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
   }
   readFileSync(file: string): string {
     return Deno.readTextFileSync(
-      isAbsolute(file) ? file : join(this.cwd, file),
+      isAbsolute(file) ? file : join(this._outputDir, file),
     );
   }
 
   chDir(newDir: string): void {
-    this.cwd = isAbsolute(newDir) ? newDir : join(this.cwd, newDir);
+    this._outputDir = isAbsolute(newDir)
+      ? newDir
+      : join(this._outputDir, newDir);
   }
   fileExists(file: string): boolean {
     return existsSync(

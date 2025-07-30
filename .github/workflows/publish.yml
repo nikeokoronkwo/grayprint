@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish:
-    # if: startsWith(github.ref_name, 'release-')
+  npm:
+    name: Publish to NPM
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -21,7 +21,48 @@ jobs:
         with:
           deno-version: 2.2.0
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+
+      - uses: actions/checkout@v4
+
+      - name: Build NPM Packages
+        run: |
+          deno task build:npm
+
+      - name: Build CLI NPM Package
+        run: npm publish --provenance --access public
+        working-directory: npm/cli
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Build Create NPM Package
+        run: npm publish --provenance --access public
+        working-directory: npm/create
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  jsr:
+    name: Publish to JSR
+    if: startsWith(github.ref_name, 'release-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # The OIDC ID token is used for authentication with JSR.
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: 2.2.0
+
+      - uses: actions/checkout@v4
+
       - name: Format
         run: deno fmt --check
-      - uses: actions/checkout@v4
       - run: npx jsr publish
