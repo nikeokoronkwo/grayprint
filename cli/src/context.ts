@@ -199,13 +199,20 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
 
   async initGit(): Promise<void> {
     if (this.git) {
-      await new Promise((resolve) => resolve(execFileSync("git", ["init"], { encoding: 'utf8', cwd: this._outputDir })));
+      await new Promise((resolve) =>
+        resolve(
+          execFileSync("git", ["init"], {
+            encoding: "utf8",
+            cwd: this._outputDir,
+          }),
+        )
+      );
     }
   }
 
   initGitSync(): void {
     if (this.git) {
-      execFileSync("git", ["init"], { encoding: 'utf8', cwd: this._outputDir });
+      execFileSync("git", ["init"], { encoding: "utf8", cwd: this._outputDir });
     }
   }
 
@@ -266,10 +273,20 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
   }
 
   async run(...args: string[]): Promise<void> {
-    await new Promise((resolve) => resolve(execFileSync(args[0], args.slice(1), { encoding: 'utf8', cwd: this._outputDir })));
+    await new Promise((resolve) =>
+      resolve(
+        execFileSync(args[0], args.slice(1), {
+          encoding: "utf8",
+          cwd: this._outputDir,
+        }),
+      )
+    );
   }
   runSync(...args: string[]): void {
-    execFileSync(args[0], args.slice(1), { encoding: 'utf8', cwd: this._outputDir });
+    execFileSync(args[0], args.slice(1), {
+      encoding: "utf8",
+      cwd: this._outputDir,
+    });
   }
   createDir(dir: string): void {
     return Deno.mkdirSync(
@@ -298,7 +315,9 @@ class TemplateBuiltContextImpl<T extends BaseTemplate>
   }
 
   chDir(newDir: string): void {
-    this._outputDir = isAbsolute(newDir) ? newDir : join(this._outputDir, newDir);
+    this._outputDir = isAbsolute(newDir)
+      ? newDir
+      : join(this._outputDir, newDir);
   }
   fileExists(file: string): boolean {
     return existsSync(

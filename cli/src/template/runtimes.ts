@@ -5,9 +5,9 @@ export type Runtime = (typeof runtimes)[number];
 export function checkAvailableRuntimes(): Promise<Runtime[]> {
   return Promise.all(
     runtimes.map((r) => {
-      return ((r === "deno"
+      return (r === "deno"
           ? checkIfExecutableExists(Deno.execPath())
-          : checkIfExecutableExists(r)))
+          : checkIfExecutableExists(r))
         ? r
         : undefined;
     }).filter((v) => v !== undefined),
@@ -16,7 +16,7 @@ export function checkAvailableRuntimes(): Promise<Runtime[]> {
 
 function checkIfExecutableExists(name: string): boolean {
   try {
-    return (spawnSync(name, { encoding: 'utf8' })).status === 0;
+    return (spawnSync(name, { encoding: "utf8" })).status === 0;
   } catch (_) {
     return false;
   }

@@ -4,27 +4,33 @@ import cliJson from "../cli/deno.json" with { type: "json" };
 await emptyDir("./npm");
 
 const [
-  { status: cliResultStatus, ...cliInfo },
-  { status: createResultStatus, ...createInfo }
+  { status: cliResultStatus },
+  { status: createResultStatus },
 ] = await Promise.allSettled([
   /** Build the CLI */
   buildGPCli(),
-  buildGPCreate()
-])
+  buildGPCreate(),
+]);
 
-console.log('CLI Build: ', cliResultStatus === 'fulfilled' ? 'success': 'failed');
-console.log('Create Build: ', createResultStatus === 'fulfilled' ? 'success': 'failed');
-
+console.log(
+  "CLI Build: ",
+  cliResultStatus === "fulfilled" ? "success" : "failed",
+);
+console.log(
+  "Create Build: ",
+  createResultStatus === "fulfilled" ? "success" : "failed",
+);
 
 async function buildGPCreate() {
   await build({
-    entryPoints: ['./packages/create/mod.ts', {
+    entryPoints: ["./packages/create/mod.ts", {
       kind: "bin",
       name: "grayprint",
       path: "./packages/create/main.ts",
     }],
     filterDiagnostic(diagnostic) {
-      if (diagnostic.file?.fileName.includes("deps/jsr.io") ||
+      if (
+        diagnostic.file?.fileName.includes("deps/jsr.io") ||
         [2554, 2339, 2304].includes(diagnostic.code) // TODO(nikeokoronkwo): May not ignore 2339
       ) {
         return false; // ignore all diagnostics from dependencies
@@ -68,7 +74,8 @@ async function buildGPCli() {
       path: "./cli/main.ts",
     }],
     filterDiagnostic(diagnostic) {
-      if (diagnostic.file?.fileName.includes("deps/jsr.io") ||
+      if (
+        diagnostic.file?.fileName.includes("deps/jsr.io") ||
         [2554, 2339, 2304].includes(diagnostic.code) // TODO(nikeokoronkwo): May not ignore 2339
       ) {
         return false; // ignore all diagnostics from dependencies
@@ -80,14 +87,15 @@ async function buildGPCli() {
     shims: {
       // see JS docs for overview and more options
       deno: true,
-      custom: []
+      custom: [],
     },
     importMap: "deno.json",
     package: {
       // package.json properties
       name: "create-grayprint",
       version: cliJson.version,
-      description: "Grayprint is a command-line tool that makes it easier to setup your projects with ease.",
+      description:
+        "Grayprint is a command-line tool that makes it easier to setup your projects with ease.",
       license: "MIT",
       repository: {
         type: "git",
